@@ -8,4 +8,8 @@
     <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CashBackMerge.Game\CashBackMerge.Game.csproj" />
+  </ItemGroup>
+
 </Project>

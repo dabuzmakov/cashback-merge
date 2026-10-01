@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CashBackMerge.App\CashBackMerge.App.csproj" />
+    <ProjectReference Include="..\CashBackMerge.Simulator\CashBackMerge.Simulator.csproj" />
   </ItemGroup>
 
   <ItemGroup>
