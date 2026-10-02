@@ -1,13 +1,23 @@
+using CashBackMerge.Game.Configuration;
+using CashBackMerge.Game.Models;
+
 namespace CashBackMerge.Tests.Mandatory.Mr1;
 
 /// <summary>Обязательные тесты: воспроизводимость по seed.</summary>
 public class SeedTest
 {
-    [Fact(DisplayName = "Одинаковый конфиг и seed дают одинаковое начальное поле",
-          Skip = "MR1: реализуй тест и удали эту строку")]
+    [Fact(DisplayName = "Одинаковый конфиг и seed дают одинаковое начальное поле")]
     public void SameConfigAndSeedProduceSameInitialBoard()
     {
-        Assert.Fail("Тест не реализован");
+        var config = new GameConfig();
+        var seed = 67;
+
+        var session1 = new GameSession(config, seed);
+        var session2 = new GameSession(config, seed);
+
+        Assert.Equal(
+            session1.Board.ToString(),
+            session2.Board.ToString());
     }
 
     [Fact(DisplayName = "Одинаковый конфиг, seed и стратегия дают одинаковый отчёт симуляции",
