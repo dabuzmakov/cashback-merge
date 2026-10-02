@@ -1,0 +1,20 @@
+{
+  "mapSize": 10,
+  "movesLimit": 10,
+  "maxRewardCashback": 10,
+  "initialState": [ 10, 10 ],
+  "spawnRules": [
+    {
+      "cashback": 10,
+      "weight": 10
+    },
+    {
+      "cashback": 10,
+      "weight": 10
+    },
+    {
+      "cashback": 10,
+      "weight": 10
+    }
+  ]
+}
