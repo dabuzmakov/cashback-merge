@@ -1,6 +1,6 @@
 ﻿namespace CashBackMerge.Game.Configuration;
 
-internal static class GameConfigValidator
+public static class GameConfigValidator
 {
     public static void Validate(GameConfig config)
     {

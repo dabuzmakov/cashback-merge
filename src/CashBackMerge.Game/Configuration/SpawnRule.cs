@@ -1,8 +1,6 @@
 ﻿namespace CashBackMerge.Game.Configuration;
 
-public struct SpawnRule
-{
-    public int Cashback { get; init; }
+public record struct SpawnRule(int Cashback, int Weight)
+{ 
 
-    public int Weight { get; init; }
 }
