@@ -14,9 +14,9 @@ public class GameConfig
 
     public IReadOnlyList<SpawnRule> SpawnRules { get; init; } = 
     [
-        new SpawnRule { Cashback = 1, Weight = 85 },
-        new SpawnRule { Cashback = 2, Weight = 10 },
-        new SpawnRule { Cashback = 4, Weight = 5 }
+        new SpawnRule { Cashback = 1, Probability = 0.85m },
+        new SpawnRule { Cashback = 2, Probability = 0.10m },
+        new SpawnRule { Cashback = 4, Probability = 0.05m }
     ];
 
     public static GameConfig FromJson(string path)

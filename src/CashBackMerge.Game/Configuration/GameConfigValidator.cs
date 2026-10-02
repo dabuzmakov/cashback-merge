@@ -54,10 +54,10 @@ public static class GameConfigValidator
             throw new ArgumentException(
                 "Неверная конфигурация SpawnRules: значения Cashback не должны повторяться");
 
-        if (config.SpawnRules.Any(rule => rule.Weight <= 0))
+        if (config.SpawnRules.Sum(rule => rule.Probability) != 1.0m)
             throw new ArgumentException(
-                "Неверная конфигурация SpawnRules: относительная вероятность каждой плитки " +
-                "(вес) должна быть положительна");
+                "Неверная конфигурация SpawnRules: сумма вероятностей появления плиток должна быть равна 1" +
+                $" Текущая сумма {config.SpawnRules.Sum(rule => rule.Probability)}");
     }
 
     private static bool IsPowerOfTwo(int n)

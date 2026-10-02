@@ -1,6 +1,6 @@
 ﻿namespace CashBackMerge.Game.Configuration;
 
-public record struct SpawnRule(int Cashback, int Weight)
+public record struct SpawnRule(int Cashback, decimal Probability)
 { 
 
 }

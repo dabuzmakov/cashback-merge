@@ -6,15 +6,15 @@
   "spawnRules": [
     {
       "cashback": 10,
-      "weight": 10
+      "probability": 0.85
     },
     {
       "cashback": 10,
-      "weight": 10
+      "probability": 0.1
     },
     {
       "cashback": 10,
-      "weight": 10
+      "probability": 0.05
     }
   ]
 }
