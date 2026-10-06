@@ -2,6 +2,6 @@
 
 public class MoveResult
 {
-    public Board Board { get; }
-    public Tile SpawnedTile { get; }
+    public Board Board { get; init; }
+    public Tile SpawnedTile { get; init; }
 }
