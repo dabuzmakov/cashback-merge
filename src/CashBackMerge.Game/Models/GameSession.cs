@@ -11,7 +11,7 @@ public class GameSession
     public GameStatus Status { get; private set; }
     public int Score { get; private set; }
 
-    public GameSession(GameConfig config, int seed)
+    internal GameSession(GameConfig config, int seed)
     {
         Board = new Board(config.MapSize);
         SpawnRandom = new Random(seed);
