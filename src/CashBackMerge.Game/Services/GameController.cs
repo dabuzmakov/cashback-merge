@@ -21,32 +21,32 @@ public class GameController
         if (session.Status != GameStatus.InProgress)
             throw new InvalidOperationException("Завершённая сессия не принимает попытки");
 
-        //left direction
+        //left-right direction with flag invertedCol
+        var invertedCol = false;
         for (var row = 0; row < Config.MapSize; row++)
         {
-            var pointer = 0;
+            var mergeQueue = new Queue<Tile>(Config.MapSize);
 
-            for (var col = 0; col < Config.MapSize; col++)
+            for (var i = 0; i < Config.MapSize; i++)
             {
-                var cell = session.Board[row, col];
+                var col = invertedCol ? Config.MapSize - 1 - i : i;
 
-                if (session.Board[row, col] == null)
-                    continue;
-
-                if (col == Config.MapSize - 1 || 
-                    session.Board[row, col + 1] != session.Board[row, col])
-                {
-                    
-                }
+                if (session.Board[row, col] != null)
+                    mergeQueue.Enqueue(session.Board[row, col]!.Value);
             }
-        }
 
-        //right direction
-        for (var row = 0; row < Config.MapSize; row++)
-        {
-            for (var col = Config.MapSize - 1; col >= 0; col--)
+            var pointer = 0;
+            while (mergeQueue.Count != 0)
             {
+                var currentTile = mergeQueue.Dequeue();
 
+                if (!mergeQueue.TryPeek(out var tile) || tile.Cashback != currentTile.Cashback)
+                    resultBoard[row, pointer++] = new Tile(currentTile.Cashback);
+                else
+                {
+                    mergeQueue.Dequeue();
+                    resultBoard[row, pointer++] = new Tile(currentTile.Cashback * 2);
+                }
             }
         }
 
@@ -80,5 +80,23 @@ public class GameController
         seed ??= _sessionSeedRandom.Next();
 
         return new GameSession(Config, (int)seed);
+    }
+
+    private class BufferPointer
+    {
+        private readonly bool _inverted;
+        public int Value { get; private set; }
+
+        public BufferPointer(int initial, bool inverted)
+        {
+            _inverted = inverted;
+            Value = initial;
+        }
+
+        public int Next()
+        {
+            Value += _inverted ? -1 : 1;
+            return Value;
+        }
     }
 }
