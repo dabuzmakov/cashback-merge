@@ -16,55 +16,13 @@ public class GameController
 
     public MoveResult ApplyMove(GameSession session, Direction direction)
     {
-        var resultBoard = new Board(Config.MapSize);
-
         if (session.Status != GameStatus.InProgress)
             throw new InvalidOperationException("Завершённая сессия не принимает попытки");
 
-        var isInnerInverted = false;
-        var isOuterInnerSwapped = false;
-
-        for (var outer = 0; outer < Config.MapSize; outer++)
+        return new MoveResult
         {
-            var mergeQueue = new Queue<Tile>(Config.MapSize);
-
-            for (var i = 0; i < Config.MapSize; i++)
-            {
-                var inner = isInnerInverted ? Config.MapSize - 1 - i : i;
-
-                var row = isOuterInnerSwapped ? inner : outer;
-                var col = isOuterInnerSwapped ? outer : inner;
-
-                if (session.Board[row, col] != null)
-                    mergeQueue.Enqueue(session.Board[row, col]!.Value);
-            }
-            
-            var pointer = new BufferPointer(Config.MapSize, isInnerInverted);
-
-            while (mergeQueue.Count != 0)
-            {
-                var currentTile = mergeQueue.Dequeue();
-
-                var index = pointer.Next();
-                var row = isOuterInnerSwapped ? index : outer;
-                var col = isOuterInnerSwapped ? outer : index;
-
-                if (!mergeQueue.TryPeek(out var tile) || tile.Cashback != currentTile.Cashback)
-                {
-                    resultBoard[row, col] = new Tile(currentTile.Cashback);
-                }
-                else
-                {
-                    mergeQueue.Dequeue();
-                    resultBoard[row, col] = new Tile(currentTile.Cashback * 2);
-                }
-            }
-        }
-
-        return new MoveResult 
-        { 
-            Board = resultBoard, 
-            SpawnedTile = new Tile(1) 
+            Board = UpdateBoard(session.Board, direction),
+            SpawnedTile = new Tile(1)
         };
     }
 
@@ -73,6 +31,76 @@ public class GameController
         seed ??= _sessionSeedRandom.Next();
 
         return new GameSession(Config, (int)seed);
+    }
+
+    private Board UpdateBoard(Board board, Direction direction)
+    {
+        var resultBoard = new Board(Config.MapSize);
+
+        var swapped = direction is Direction.Up or Direction.Down;
+        var inverted = direction is Direction.Right or Direction.Down;
+
+        for (var outer = 0; outer < Config.MapSize; outer++)
+        {
+            var queue = CreateMergeQueue(board, direction, outer);
+            var merged = MergeLine(queue);
+
+            var pointer = new BufferPointer(Config.MapSize, inverted);
+
+            foreach (var tile in merged)
+            {
+                var slidingIndex = pointer.Next();
+                var row = swapped ? slidingIndex : outer;
+                var col = swapped ? outer : slidingIndex;
+
+                resultBoard[row, col] = tile;
+            }
+        }
+
+        return resultBoard;
+    }
+
+    private Queue<Tile> CreateMergeQueue(Board board, Direction direction, int fixedIndex)
+    {
+        var mergeQueue = new Queue<Tile>(Config.MapSize);
+
+        var swapped = direction is Direction.Up or Direction.Down;
+        var inverted = direction is Direction.Right or Direction.Down;
+
+        for (var i = 0; i < Config.MapSize; i++)
+        {
+            var slidingIndex = inverted ? Config.MapSize - 1 - i : i;
+
+            var row = swapped ? slidingIndex : fixedIndex;
+            var col = swapped ? fixedIndex : slidingIndex;
+
+            if (board[row, col] != null)
+                mergeQueue.Enqueue(board[row, col]!.Value);
+        }
+
+        return mergeQueue;
+    }
+
+    private List<Tile> MergeLine(Queue<Tile> mergeQueue)
+    {
+        var merged = new List<Tile>();
+
+        while (mergeQueue.Count != 0)
+        {
+            var currentTile = mergeQueue.Dequeue();
+
+            if (!mergeQueue.TryPeek(out var tile) || tile.Cashback != currentTile.Cashback)
+            {
+                merged.Add(new Tile(currentTile.Cashback));
+            }
+            else
+            {
+                mergeQueue.Dequeue();
+                merged.Add(new Tile(currentTile.Cashback * 2));
+            }
+        }
+
+        return merged;
     }
 
     private class BufferPointer
