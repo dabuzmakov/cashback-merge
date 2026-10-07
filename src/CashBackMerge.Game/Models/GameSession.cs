@@ -1,4 +1,5 @@
 ﻿using CashBackMerge.Game.Configuration;
+using System.Drawing;
 
 namespace CashBackMerge.Game.Models;
 
@@ -27,11 +28,13 @@ public class GameSession
         if (Status != GameStatus.InProgress)
             throw new InvalidOperationException("Завершённая сессия не принимает попытки");
 
-        Board.TryMove(direction);
+        if (!Board.TryMove(direction))
+            return;
+
         UsedMoves++;
         //Score += spawned.CashBack;
 
-        if (UsedMoves == Config.MovesLimit)
+        if (UsedMoves == Config.MovesLimit || !Board.HasAvailableMove())
             Status = GameStatus.End;
     }
 

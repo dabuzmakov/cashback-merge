@@ -42,6 +42,31 @@ public class Board
         return changed;
     }
 
+    public bool HasAvailableMove()
+    {
+        for (var row = 0; row < Size; row++)
+        for (var col = 0; col < Size; col++)
+        {
+            if (this[row, col] is not Tile current)
+                return true;
+
+            if (current.Cashback == MaxRewardCashback)
+                continue;
+
+            if (col + 1 < Size &&
+                this[row, col + 1] is Tile right &&
+                current.Cashback == right.Cashback)
+                return true;
+
+            if (row + 1 < Size &&
+                this[row + 1, col] is Tile down &&
+                current.Cashback == down.Cashback)
+                return true;
+        }
+
+        return false;
+    }
+
     private List<Tile?> ReadLine(Direction direction, int fixedIndex)
     {
         var line = new List<Tile?>(Size);
@@ -73,9 +98,10 @@ public class Board
 
         for (var i = 0; i < tiles.Count; i++)
         {
-            var mergedTile = i + 1 < tiles.Count
-                && tiles[i].Cashback < MaxRewardCashback
-                && tiles[i].Cashback == tiles[i + 1].Cashback
+            var mergedTile = 
+                i + 1 < tiles.Count &&
+                tiles[i].Cashback < MaxRewardCashback &&
+                tiles[i].Cashback == tiles[i + 1].Cashback
                 ? new Tile(tiles[i++].Cashback * 2)
                 : tiles[i];
 
