@@ -6,32 +6,36 @@ public class GameSession
 {
     public Random SpawnRandom { get; }
     public GameConfig Config { get; }
-    public Board Board { get; private set; }
+
+    public Board Board { get; init; }
     public int UsedMoves { get; private set; }
     public GameStatus Status { get; private set; }
     public int Score { get; private set; }
 
     internal GameSession(GameConfig config, int seed)
     {
-        Board = new Board(config.MapSize);
+        Board = InitializeBoard();
         SpawnRandom = new Random(seed);
         Config = config;
 
         Status = GameStatus.InProgress;
         Score = config.InitialState.Sum();
-
-        InitializeBoard();
     }
 
-    public void RegisterMove(MoveResult result)
+    public void ApplyMove(Direction direction)
     {
-        Board = result.Board;
+        if (Status != GameStatus.InProgress)
+            throw new InvalidOperationException("Завершённая сессия не принимает попытки");
+
+        Board.Move(direction);
         UsedMoves++;
-        Score += result.SpawnedTile.Cashback;
+        //Score += spawned.CashBack;
     }
 
-    private void InitializeBoard()
+    private Board InitializeBoard()
     {
+        var board = new Board(Config.MapSize);
+
         foreach (var cashback in Config.InitialState)
         {
             var index = SpawnRandom.Next(Board.Size * Board.Size);
@@ -41,5 +45,7 @@ public class GameSession
 
             Board[index / Board.Size, index % Board.Size] = new Tile(cashback);
         }
+
+        return board;
     }
 }
