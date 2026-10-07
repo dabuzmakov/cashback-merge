@@ -27,14 +27,17 @@ public class GameSession
         if (Status != GameStatus.InProgress)
             throw new InvalidOperationException("Завершённая сессия не принимает попытки");
 
-        Board.Move(direction);
+        Board.TryMove(direction);
         UsedMoves++;
         //Score += spawned.CashBack;
+
+        if (UsedMoves == Config.MovesLimit)
+            Status = GameStatus.End;
     }
 
     private Board InitializeBoard()
     {
-        var board = new Board(Config.MapSize);
+        var board = new Board(Config.MapSize, Config.MaxRewardCashback);
 
         foreach (var cashback in Config.InitialState)
         {

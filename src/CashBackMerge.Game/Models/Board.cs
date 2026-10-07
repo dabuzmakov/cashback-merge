@@ -5,12 +5,14 @@ namespace CashBackMerge.Game.Models;
 public class Board
 {
     private readonly Tile?[,] _board;
+    public int MaxRewardCashback { get; }
     public int Size { get; }
 
-    public Board(int boardSize)
+    public Board(int boardSize, int maxRewardCashback)
     {
         _board = new Tile?[boardSize, boardSize];
         Size = boardSize;
+        MaxRewardCashback = maxRewardCashback;
     }
 
     public Tile? this[int row, int column]
@@ -19,33 +21,30 @@ public class Board
         set => _board[row, column] = value;
     }
 
-    public void Move(Direction direction)
+    public bool TryMove(Direction direction)
     {
+        var changed = false;
         var swapped = direction is Direction.Up or Direction.Down;
         var inverted = direction is Direction.Right or Direction.Down;
 
         for (var outer = 0; outer < Size; outer++)
         {
-            var queue = CreateMergeQueue(direction, outer);
-            var merged = MergeLine(queue);
+            var line = ReadLine(direction, outer);
+            var merged = MergeLine(line);
 
-            ClearLine(direction, outer);
+            if (line.SequenceEqual(merged))
+                continue;
 
-            var pointer = new BufferPointer(Size, inverted);
-            foreach (var tile in merged)
-            {
-                var slidingIndex = pointer.Next();
-                var row = swapped ? slidingIndex : outer;
-                var col = swapped ? outer : slidingIndex;
-
-                this[row, col] = tile;
-            }
+            changed = true;
+            WriteLine(direction, outer, merged);
         }
+
+        return changed;
     }
 
-    private Queue<Tile> CreateMergeQueue(Direction direction, int fixedIndex)
+    private List<Tile?> ReadLine(Direction direction, int fixedIndex)
     {
-        var mergeQueue = new Queue<Tile>(Size);
+        var line = new List<Tile?>(Size);
 
         var swapped = direction is Direction.Up or Direction.Down;
         var inverted = direction is Direction.Right or Direction.Down;
@@ -57,45 +56,51 @@ public class Board
             var row = swapped ? slidingIndex : fixedIndex;
             var col = swapped ? fixedIndex : slidingIndex;
 
-            if (this[row, col] != null)
-                mergeQueue.Enqueue(this[row, col]!.Value);
+            line.Add(this[row, col]);
         }
 
-        return mergeQueue;
+        return line;
     }
 
-    private List<Tile> MergeLine(Queue<Tile> mergeQueue)
+    private List<Tile?> MergeLine(List<Tile?> line)
     {
-        var merged = new List<Tile>();
+        var merged = new List<Tile?>();
 
-        while (mergeQueue.Count != 0)
+        var tiles = line
+            .Where(tile => tile.HasValue)
+            .Select(tile => tile!.Value)
+            .ToList();
+
+        for (var i = 0; i < tiles.Count; i++)
         {
-            var currentTile = mergeQueue.Dequeue();
+            var mergedTile = i + 1 < tiles.Count
+                && tiles[i].Cashback < MaxRewardCashback
+                && tiles[i].Cashback == tiles[i + 1].Cashback
+                ? new Tile(tiles[i++].Cashback * 2)
+                : tiles[i];
 
-            if (!mergeQueue.TryPeek(out var tile) || tile.Cashback != currentTile.Cashback)
-            {
-                merged.Add(new Tile(currentTile.Cashback));
-            }
-            else
-            {
-                mergeQueue.Dequeue();
-                merged.Add(new Tile(currentTile.Cashback * 2));
-            }
+            merged.Add(mergedTile);
         }
+
+        while (merged.Count < Size)
+            merged.Add(null);
 
         return merged;
     }
 
-    private void ClearLine(Direction direction, int fixedIndex)
+    private void WriteLine(Direction direction, int fixedIndex, List<Tile?> line)
     {
         var swapped = direction is Direction.Up or Direction.Down;
+        var inverted = direction is Direction.Right or Direction.Down;
 
         for (var i = 0; i < Size; i++)
         {
-            var row = swapped ? i : fixedIndex;
-            var col = swapped ? fixedIndex : i;
+            var slidingIndex = inverted ? Size - 1 - i : i;
 
-            this[row, col] = null;
+            var row = swapped ? slidingIndex : fixedIndex;
+            var col = swapped ? fixedIndex : slidingIndex;
+
+            this[row, col] = line[i];
         }
     }
 
@@ -116,20 +121,5 @@ public class Board
         }
 
         return builder.ToString();
-    }
-
-    private class BufferPointer
-    {
-        private readonly bool _inverted;
-        public int Value { get; private set; }
-
-        public BufferPointer(int bufferLength, bool inverted)
-        {
-            _inverted = inverted;
-            Value = inverted ? bufferLength - 1 : 0;
-        }
-
-        public int Next()
-            => _inverted ? Value-- : Value++;
     }
 }
