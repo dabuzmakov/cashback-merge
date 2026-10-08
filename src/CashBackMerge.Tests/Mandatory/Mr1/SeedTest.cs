@@ -1,5 +1,5 @@
 using CashBackMerge.Game.Configuration;
-using CashBackMerge.Game.Models;
+using CashBackMerge.Game.Services;
 
 namespace CashBackMerge.Tests.Mandatory.Mr1;
 
@@ -11,9 +11,10 @@ public class SeedTest
     {
         var config = new GameConfig();
         var seed = 67;
+        var controller = new GameController(config, seed);
 
-        var session1 = new GameSession(config, seed);
-        var session2 = new GameSession(config, seed);
+        var session1 = controller.CreateNewGame(seed);
+        var session2 = controller.CreateNewGame(seed);
 
         Assert.Equal(
             session1.Board.ToString(),

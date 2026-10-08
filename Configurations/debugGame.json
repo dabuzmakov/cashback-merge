@@ -5,15 +5,15 @@
   "initialState": [ 10, 10 ],
   "spawnRules": [
     {
-      "cashback": 10,
+      "value": 10,
       "probability": 0.85
     },
     {
-      "cashback": 10,
+      "value": 10,
       "probability": 0.1
     },
     {
-      "cashback": 10,
+      "value": 10,
       "probability": 0.05
     }
   ]

@@ -12,11 +12,14 @@ public class GameConfig
 
     public IReadOnlyList<int> InitialState { get; init; } = [1, 1];
 
-    public IReadOnlyList<SpawnRule> SpawnRules { get; init; } = 
+    //MR2 mandatory tests
+    public string? DeterminedStringState { get; init; } = null;
+
+    public IReadOnlyList<ProbabilityRule> SpawnRules { get; init; } = 
     [
-        new SpawnRule { Cashback = 1, Probability = 0.85m },
-        new SpawnRule { Cashback = 2, Probability = 0.10m },
-        new SpawnRule { Cashback = 4, Probability = 0.05m }
+        new ProbabilityRule { Value = 1, Probability = 0.85m },
+        new ProbabilityRule { Value = 2, Probability = 0.1m },
+        new ProbabilityRule { Value = 4, Probability = 0.05m }
     ];
 
     public static GameConfig FromJson(string path)
