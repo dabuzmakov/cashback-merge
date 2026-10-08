@@ -1,5 +1,4 @@
 using CashBackMerge.Game.Configuration;
-using CashBackMerge.Game.Models;
 using CashBackMerge.Game.Services;
 
 namespace CashBackMerge.Tests.Mandatory.Mr1;

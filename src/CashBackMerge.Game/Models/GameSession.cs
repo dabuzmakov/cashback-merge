@@ -15,12 +15,12 @@ public class GameSession
 
     internal GameSession(GameConfig config, int seed)
     {
-        Board = InitializeBoard();
-        SpawnRandom = new Random(seed);
         Config = config;
-
+        SpawnRandom = new Random(seed);
         Status = GameStatus.InProgress;
         Score = config.InitialState.Sum();
+
+        Board = InitializeBoard();
     }
 
     public void ApplyMove(Direction direction)
@@ -44,12 +44,12 @@ public class GameSession
 
         foreach (var cashback in Config.InitialState)
         {
-            var index = SpawnRandom.Next(Board.Size * Board.Size);
+            var index = SpawnRandom.Next(board.Size * board.Size);
 
-            while (Board[index / Board.Size, index % Board.Size] != null)
-                index = SpawnRandom.Next(Board.Size * Board.Size);
+            while (board[index / board.Size, index % board.Size] != null)
+                index = SpawnRandom.Next(board.Size * board.Size);
 
-            Board[index / Board.Size, index % Board.Size] = new Tile(cashback);
+            board[index / board.Size, index % board.Size] = new Tile(cashback);
         }
 
         return board;

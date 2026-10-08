@@ -40,17 +40,17 @@ public static class GameConfigValidator
             throw new ArgumentException(
                 "Неверная конфигурация SpawnRules: правила появления плиток не могут быть пустыми");
 
-        if (config.SpawnRules.Any(rule => !IsPowerOfTwo(rule.Cashback)))
+        if (config.SpawnRules.Any(rule => !IsPowerOfTwo(rule.Value)))
             throw new ArgumentException(
                 "Неверная конфигурация SpawnRules: значение каждой появившейся плитки на поле " +
                 "должно быть степенью двойки");
 
-        if (config.SpawnRules.Any(rule => rule.Cashback > config.MaxRewardCashback))
+        if (config.SpawnRules.Any(rule => rule.Value > config.MaxRewardCashback))
             throw new ArgumentException(
                 $"Неверная конфигурация SpawnRules: каждая новая плитка по значению не может " +
                 $"превосходить MaxRewardCashback: {config.MaxRewardCashback}");
 
-        if (config.SpawnRules.GroupBy(rule => rule.Cashback).Any(group => group.Count() > 1))
+        if (config.SpawnRules.GroupBy(rule => rule.Value).Any(group => group.Count() > 1))
             throw new ArgumentException(
                 "Неверная конфигурация SpawnRules: значения Cashback не должны повторяться");
 
