@@ -42,14 +42,13 @@ public class GameSession
         UsedMoves++;
         Score += spawned.Cashback;
 
-        if (UsedMoves == Config.MovesLimit || !Board.HasAvailableMove())
+        if (UsedMoves >= Config.MovesLimit || !Board.HasAvailableMove())
             Status = GameStatus.End;
     }
 
     private void InitializeBoard()
     {
         Board = new Board(Config.MapSize, Config.MaxRewardCashback);
-        var emptyCells = Board.GetEmptyPositions();
 
         foreach (var cashback in Config.InitialState)
         {

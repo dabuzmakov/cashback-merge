@@ -60,6 +60,10 @@ public static class GameConfigValidator
             throw new ArgumentException(
                 "Неверная конфигурация SpawnRules: значения Cashback не должны повторяться");
 
+        if (config.SpawnRules.Any(rule => rule.Probability <= 0))
+            throw new ArgumentException(
+                "Неверная конфигурация SpawnRules: вероятности должны быть положительными");
+
         if (config.SpawnRules.Sum(rule => rule.Probability) != 1.0m)
             throw new ArgumentException(
                 "Неверная конфигурация SpawnRules: сумма вероятностей появления плиток должна быть " +
@@ -71,8 +75,8 @@ public static class GameConfigValidator
 
             if (scale > _maxProbabilityScale)
                 throw new ArgumentException(
-                    $"Максимальная точность определения вероятности {_maxProbabilityScale} " +
-                    $"знаков после запятой");
+                    "Неверная конфигурация SpawnRules: максимальная точность определения вероятности " +
+                    $"{_maxProbabilityScale} знаков после запятой");
         }
     }
 
