@@ -1,22 +1,24 @@
 ﻿using CashBackMerge.Game.Configuration;
-using System.Numerics;
 
 namespace CashBackMerge.Game.Extensions;
 
 public static class ProbabilityExtensions
 {
-    public static List<(int Value, Int128 Weight)> ToWeightedValues(this List<ProbabilityRule> rules)
+    private const int _maxProbabilityScale = 18;
+
+    public static List<(int Value, long Weight)> ToWeightedValues(this List<ProbabilityRule> rules)
     {
         var maxScale = rules.Max(rule =>
             (decimal.GetBits(rule.Probability)[3] >> 16) & 0xFF);
 
-        decimal modifier = 1;
+        if (maxScale > _maxProbabilityScale)
+            throw new ArgumentException($"Точность вероятностей слишком высокая: " +
+                $"{maxScale} > {_maxProbabilityScale}");
 
-        for (var i = 0; i < maxScale; i++)
-            modifier *= 10;
+        var modifier = (long)Math.Pow(10, maxScale);
 
         return rules
-            .Select(rule => (rule.Value, (Int128)(rule.Probability * modifier)))
+            .Select(rule => (rule.Value, (long)(rule.Probability * modifier)))
             .ToList();
     }
 }

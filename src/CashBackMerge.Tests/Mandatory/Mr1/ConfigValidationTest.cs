@@ -20,7 +20,7 @@ public class ConfigValidationTest
             SpawnRules = 
             [
                 new ProbabilityRule(1, 0.85m),
-                new ProbabilityRule(2, 0.099999999999999999999999m),
+                new ProbabilityRule(2, 0.099999999999999999m),
                 new ProbabilityRule(4, 0.05m),
             ] 
         };

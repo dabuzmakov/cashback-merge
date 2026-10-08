@@ -67,6 +67,18 @@ public class Board
         return false;
     }
 
+    public List<(int Row, int Col)> GetEmptyPositions()
+    {
+        var emptyCells = new List<(int Row, int Col)>();
+
+        for (var row = 0; row < Size; row++)
+            for (var col = 0; col < Size; col++)
+                if (this[row, col] is null)
+                    emptyCells.Add((row, col));
+
+        return emptyCells;
+    }
+
     private List<Tile?> ReadLine(Direction direction, int fixedIndex)
     {
         var line = new List<Tile?>(Size);
