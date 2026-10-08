@@ -150,12 +150,14 @@ public class Board
         {
             for (var column = 0; column < Size; column++)
             {
-                var value = _board[row, column]?.Cashback.ToString() ?? ".";
+                if (column > 0)
+                    builder.Append(',');
 
-                builder.Append($"{value,4}");
+                builder.Append(_board[row, column]?.Cashback.ToString() ?? ".");
             }
 
-            builder.AppendLine();
+            if (row < Size - 1)
+                builder.AppendLine();
         }
 
         return builder.ToString();
