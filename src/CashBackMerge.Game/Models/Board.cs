@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using CashBackMerge.Game.Configuration;
+using System.Text;
 
 namespace CashBackMerge.Game.Models;
 
@@ -161,5 +162,24 @@ public class Board
         }
 
         return builder.ToString();
+    }
+
+    public static Board FromString(string stringBoard)
+    {
+        var config = new GameConfig();
+        var board = new Board(config.MapSize, config.MaxRewardCashback);
+
+        var rows = stringBoard.Split("\r\n");
+
+        for (var row = 0; row < board.Size; row++)
+        {
+            var cells = rows[row].Split(',');
+
+            for (var col = 0; col < board.Size; col++)
+                if (cells[col] != ".")
+                    board[row, col] = new Tile(int.Parse(cells[col]));
+        }
+
+        return board;
     }
 }

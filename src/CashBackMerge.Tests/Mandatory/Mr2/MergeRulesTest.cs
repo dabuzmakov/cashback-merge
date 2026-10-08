@@ -36,28 +36,9 @@ public class MergeRulesTest
     public void MergeWorksInAllDirections(string before, string expected, Direction direction)
         => AssertMove(before, expected, direction);
 
-    private static Board ParseBoard(string stringBoard)
-    {
-        var config = new GameConfig();
-        var board = new Board(config.MapSize, config.MaxRewardCashback);
-
-        var rows = stringBoard.Split("\r\n");
-
-        for (var row = 0; row < board.Size; row++)
-        {
-            var cells = rows[row].Split(',');
-
-            for (var col = 0; col < board.Size; col++)
-                if (cells[col] != ".")
-                    board[row, col] = new Tile(int.Parse(cells[col]));
-        }
-
-        return board;
-    }
-
     private static void AssertMove(string before, string expected, Direction direction)
     {
-        var board = ParseBoard(before);
+        var board = Board.FromString(before);
 
         board.TryMove(direction);
 

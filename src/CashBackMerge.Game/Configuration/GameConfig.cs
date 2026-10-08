@@ -12,6 +12,9 @@ public class GameConfig
 
     public IReadOnlyList<int> InitialState { get; init; } = [1, 1];
 
+    //MR2 mandatory tests
+    public string? DeterminedStringState { get; init; } = null;
+
     public IReadOnlyList<ProbabilityRule> SpawnRules { get; init; } = 
     [
         new ProbabilityRule { Value = 1, Probability = 0.85m },

@@ -25,6 +25,9 @@ public class GameSession
         Score = config.InitialState.Sum();
 
         InitializeBoard();
+
+        var state = config.DeterminedStringState;
+        if (state != null) Board = Board.FromString(state);
     }
 
     public void ApplyMove(Direction direction)
