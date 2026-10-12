@@ -34,15 +34,16 @@ public class GameSession
         if (Status != GameStatus.InProgress)
             throw new InvalidOperationException("Завершённая сессия не принимает попытки");
 
-        if (!Board.TryMove(direction))
-            return;
+        var moveResult = Board.TryMove(direction);
+
+        if (!moveResult.Changed) return;
+
+        UsedMoves++;
+        Score += moveResult.ScoreGained;
 
         var spawned = new Tile(_spawnRandom.Next());
         var empty = GetRandomPosition();
         Board[empty.Row, empty.Col] = spawned;
-
-        UsedMoves++;
-        Score += spawned.Cashback;
 
         if (UsedMoves >= Config.MovesLimit || !Board.HasAvailableMove())
             Status = GameStatus.End;

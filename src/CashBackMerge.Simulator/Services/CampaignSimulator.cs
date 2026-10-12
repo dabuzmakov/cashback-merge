@@ -21,10 +21,13 @@ public class CampaignSimulator
 
     public CampaignStatistics Run()
     {
-        var totalScore = 0;
-        var maxScore = 0;
-        var totalReward = 0;
-
-    Dictionary< int, (int Players, int Rate) > RewardDistribution
+        var rewardDistribution = new Dictionary<int, (int Players, int Rate)>();
+        var (totalScore, maxScore, totalReward) = (0, 0, 0);
+        
+        for (var i = 0; i < _campaignConfig.PlayersCount)
+        {
+            var session = _controller.CreateNewGame();
+            
+        }
     }
 }

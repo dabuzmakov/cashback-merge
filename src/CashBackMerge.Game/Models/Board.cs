@@ -22,25 +22,27 @@ public class Board
         set => _board[row, column] = value;
     }
 
-    public bool TryMove(Direction direction)
+    public MoveResult TryMove(Direction direction)
     {
         var changed = false;
+        var scoreGained = 0;
         var swapped = direction is Direction.Up or Direction.Down;
         var inverted = direction is Direction.Right or Direction.Down;
 
         for (var outer = 0; outer < Size; outer++)
         {
             var line = ReadLine(direction, outer);
-            var merged = MergeLine(line);
+            var mergeResult = MergeLine(line);
 
-            if (line.SequenceEqual(merged))
+            if (line.SequenceEqual(mergeResult.Tiles))
                 continue;
 
+            scoreGained += mergeResult.ScoreGained;
             changed = true;
-            WriteLine(direction, outer, merged);
+            WriteLine(direction, outer, mergeResult.Tiles);
         }
 
-        return changed;
+        return new MoveResult(changed, scoreGained);
     }
 
     public bool HasAvailableMove()
@@ -100,8 +102,9 @@ public class Board
         return line;
     }
 
-    private List<Tile?> MergeLine(List<Tile?> line)
+    private LineMergeResult MergeLine(List<Tile?> line)
     {
+        var scoreGained = 0;
         var merged = new List<Tile?>();
 
         var tiles = line
@@ -111,20 +114,21 @@ public class Board
 
         for (var i = 0; i < tiles.Count; i++)
         {
-            var mergedTile = 
-                i + 1 < tiles.Count &&
+            if (i + 1 < tiles.Count &&
                 tiles[i].Cashback < MaxRewardCashback &&
-                tiles[i].Cashback == tiles[i + 1].Cashback
-                ? new Tile(tiles[i++].Cashback * 2)
-                : tiles[i];
-
-            merged.Add(mergedTile);
+                tiles[i].Cashback == tiles[i + 1].Cashback)
+            {
+                var cashback = tiles[i++].Cashback * 2;
+                merged.Add(new Tile(cashback));
+                scoreGained += cashback;
+            }
+            else merged.Add(tiles[i]);
         }
 
         while (merged.Count < Size)
             merged.Add(null);
 
-        return merged;
+        return new LineMergeResult(merged, scoreGained);
     }
 
     private void WriteLine(Direction direction, int fixedIndex, List<Tile?> line)
