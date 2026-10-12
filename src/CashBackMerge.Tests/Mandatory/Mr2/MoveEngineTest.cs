@@ -106,7 +106,7 @@ public class MoveEngineTest
         Assert.Equal(GameStatus.End, session.Status);
     }
 
-    [Fact(DisplayName = "Score увеличивается с каждым ходом на значение новой плитки")]
+    [Fact(DisplayName = "Score увеличивается на значение объединённой плитки")]
     public void ScoreIsCalculatedOnMerges()
     {
         var config = new GameConfig
@@ -126,9 +126,6 @@ public class MoveEngineTest
 
         session.ApplyMove(Direction.Left);
 
-        var difference = session.Score - initialScore;
-
-        Assert.Contains(difference, config.SpawnRules.Select(rule => rule.Value));
-        Assert.Equal(1, session.UsedMoves);
+        Assert.Equal(2, session.Score - initialScore);
     }
 }

@@ -21,7 +21,7 @@ public class GameSession
         _spawnRandom = new WeightedRandom(Config.SpawnRules.ToList(), _random);
 
         Status = GameStatus.InProgress;
-        Score = config.InitialState.Sum();
+        Score = 0;
 
         InitializeBoard();
 
