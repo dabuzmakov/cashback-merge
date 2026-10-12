@@ -5,7 +5,7 @@ namespace CashBackMerge.Simulator.Configuration;
 public class CampaignConfig
 {
     public int PlayersCount { get; init; } = 10000;
-    public string Strategy { get; init; } = "random";
+    public string StrategyName { get; init; } = "random";
     public decimal MaxRewardAllowedRate { get; init; } = 0.45m;
 
     public static CampaignConfig FromJson(string path)

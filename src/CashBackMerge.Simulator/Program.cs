@@ -13,5 +13,10 @@ public class Program
         var gameConfig = GameConfig.FromJson(launchSettings.GameConfigName);
         var campaignConfig = CampaignConfig.FromJson(launchSettings.CampaignConfigName);
 
+        var simulator = new CampaignSimulator(campaignConfig, gameConfig, launchSettings.Seed);
+
+
+        var statistics = simulator.Run();
+        reportBuilder.Bulid(statistics);
     }
 }
