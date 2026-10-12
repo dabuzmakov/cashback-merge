@@ -8,7 +8,7 @@ public class CampaignConfig
     public string Strategy { get; init; } = "random";
     public decimal MaxRewardAllowedRate { get; init; } = 0.45m;
 
-    public CampaignConfig FromJson(string path)
+    public static CampaignConfig FromJson(string path)
     {
         using var stream = File.OpenRead(path);
 
