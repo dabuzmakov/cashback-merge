@@ -1,10 +1,23 @@
-﻿using CashBackMerge.Simulator.Strategies;
+﻿using System.Text.Json;
 
 namespace CashBackMerge.Simulator.Configuration;
 
 public class CampaignConfig
 {
-    public int PlayerCount { get; init; }
-    public IGameStrategy Strategy { get; init; }
-    public double MaxRewardAllowedRate { get; init; }
+    public int PlayersCount { get; init; } = 10000;
+    public string Strategy { get; init; } = "random";
+    public decimal MaxRewardAllowedRate { get; init; } = 0.45m;
+
+    public CampaignConfig FromJson(string path)
+    {
+        using var stream = File.OpenRead(path);
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        return JsonSerializer.Deserialize<CampaignConfig>(stream, options)
+           ?? throw new InvalidOperationException("Ошибка десереализации конфига симуляции");
+    }
 }

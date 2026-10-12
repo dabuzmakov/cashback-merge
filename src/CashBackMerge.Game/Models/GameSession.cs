@@ -6,7 +6,6 @@ namespace CashBackMerge.Game.Models;
 public class GameSession
 {
     public GameConfig Config { get; }
-
     public Board Board { get; private set; }
     public int UsedMoves { get; private set; }
     public GameStatus Status { get; private set; }
