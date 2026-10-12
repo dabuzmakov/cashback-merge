@@ -14,9 +14,9 @@ public class Program
         var campaignConfig = CampaignConfig.FromJson(launchSettings.CampaignConfigName);
 
         var simulator = new CampaignSimulator(campaignConfig, gameConfig, launchSettings.Seed);
-
+        var reportBuilder = new MarkdownReportBuilder(launchSettings.OutputFileName);
 
         var statistics = simulator.Run();
-        reportBuilder.Bulid(statistics);
+        reportBuilder.Build(statistics);
     }
 }

@@ -1,6 +1,15 @@
-﻿namespace CashBackMerge.Simulator.Models;
+﻿using CashBackMerge.Game.Configuration;
+using CashBackMerge.Simulator.Configuration;
 
-public class CampaignStatistics
+namespace CashBackMerge.Simulator.Models;
+
+public record CampaignStatistics(
+    GameConfig GameConfig,
+    CampaignConfig CampaignConfig,
+    decimal AverageScore,
+    int MaxScore,
+    decimal AverageReward,
+    Dictionary<int, (int Players, int Rate)> RewardDistribution)
 {
 
 }
