@@ -37,14 +37,12 @@ public class SeedTest
     [Fact(DisplayName = "Одинаковый конфиг, seed и стратегия дают одинаковый отчёт симуляции")]
     public void SameInputsProduceSameSimulationReport()
     {
-        var seed = 67;
-
         var campaignConfig = new CampaignConfig(
             PlayersCount: 10000,
             MaxRewardAllowedRate: 0.15m,
             StrategyName: "circle");
 
-        var simulator = new CampaignSimulator(campaignConfig, _config, seed);
+        var simulator = new CampaignSimulator(campaignConfig, _config, seed: 67);
 
         var statistics1 = simulator.Run();
         var statistics2 = simulator.Run();

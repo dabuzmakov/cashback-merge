@@ -31,6 +31,7 @@ public class GameSession
             _config.MaxRewardCashback);
 
         Status = GameStatus.InProgress;
+        (Score, UsedMoves) = (0, 0);
     }
 
     public void ApplyMove(Direction direction)

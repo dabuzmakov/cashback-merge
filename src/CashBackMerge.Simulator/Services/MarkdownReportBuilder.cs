@@ -106,18 +106,23 @@ public class MarkdownReportBuilder
             var rate = players / (double)playersCount * 100;
             report.AppendLine($"    {tile}: {players} ({rate:F2}%)");
         }
+
+        report.AppendLine();
+        var maxRewardRate = GetMaxRewardRate(statistics) * 100;
+        report.AppendLine(
+            $"- Доля игроков с максимальной наградой: {maxRewardRate:F2}%");
     }
 
     private static string GetCampaignStatus(CampaignStatistics statistics)
-    {
-        var campaign = statistics.CampaignConfig;
-        var maxRewardPlayers = statistics.RewardDistribution
-            .GetValueOrDefault(statistics.GameConfig.MaxRewardCashback);
-
-        var maxRewardRate = maxRewardPlayers / (decimal)campaign.PlayersCount;
-
-        return maxRewardRate <= campaign.MaxRewardAllowedRate
+        => GetMaxRewardRate(statistics) <= statistics.CampaignConfig.MaxRewardAllowedRate
             ? "ОК"
             : "Failed";
+
+    private static decimal GetMaxRewardRate(CampaignStatistics statistics)
+    {
+        var players = statistics.RewardDistribution
+            .GetValueOrDefault(statistics.GameConfig.MaxRewardCashback);
+
+        return players / (decimal)statistics.CampaignConfig.PlayersCount;
     }
 }
