@@ -5,7 +5,7 @@ namespace CashBackMerge.Simulator.Configuration;
 
 public class ConfigurationBuilder
 {
-    private string _basePath;
+    private string _basePath = null!;
 
     public ConfigurationBuilder SetBasePath(string path)
     {

@@ -11,10 +11,11 @@ public static class StrategyMapper
 
     public static bool TryGetValue(string name, out IGameStrategy strategy)
     {
-        var exists = Strategies.TryGetValue(name, out var gameStrategy);
+        strategy = Strategies.TryGetValue(name, out var gameStrategy) 
+            ? gameStrategy 
+            : null!;
 
-        strategy = gameStrategy;
-        return exists;
+        return strategy != null;
     }
 
     public static IGameStrategy Get(string name)

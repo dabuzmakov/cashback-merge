@@ -7,7 +7,7 @@ namespace CashBackMerge.Simulator.Services;
 
 public class MarkdownReportBuilder
 {
-    private string _basePath;
+    private string _basePath = null!;
 
     public void Build(CampaignStatistics statistics, string outputFileName)
     {
@@ -111,8 +111,8 @@ public class MarkdownReportBuilder
     private static string GetCampaignStatus(CampaignStatistics statistics)
     {
         var campaign = statistics.CampaignConfig;
-        var maxRewardPlayers = statistics
-            .RewardDistribution[statistics.GameConfig.MaxRewardCashback];
+        var maxRewardPlayers = statistics.RewardDistribution
+            .GetValueOrDefault(statistics.GameConfig.MaxRewardCashback);
 
         var maxRewardRate = maxRewardPlayers / (decimal)campaign.PlayersCount;
 
