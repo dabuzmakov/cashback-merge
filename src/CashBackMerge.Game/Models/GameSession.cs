@@ -13,7 +13,9 @@ public class GameSession
     public int UsedMoves { get; private set; }
     public int Score { get; private set; }
     public GameStatus Status { get; private set; }
+
     public int Reward => _board.GetMaxTileValue();
+    public string StringBoard => _board.ToString();
 
     internal GameSession(GameConfig config, int seed)
     {

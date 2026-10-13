@@ -6,6 +6,6 @@ public record GameConfig(
     int MaxRewardCashback,
     IReadOnlyList<int> InitialState,
     IReadOnlyList<ProbabilityRule> SpawnRules,
-    string? DeterminedStringState) : IConfig
+    string? DeterminedStringState = null) : IConfig
 {
 }

@@ -5,24 +5,34 @@ namespace CashBackMerge.Tests.Mandatory.Mr1;
 /// <summary>Обязательные тесты: конфиг кампании.</summary>
 public class ConfigValidationTest
 {
+    private readonly GameConfig _config = new GameConfig(
+        MapSize: 4,
+        MovesLimit: 40,
+        MaxRewardCashback: 32,
+        InitialState: [1, 1],
+        SpawnRules:
+        [
+            new ProbabilityRule(1, 0.85m),
+            new ProbabilityRule(2, 0.10m),
+            new ProbabilityRule(4, 0.05m)
+        ]
+    );
+
     [Fact(DisplayName = "Валидный конфиг принимается")]
     public void ValidConfigIsAccepted()
-    {
-        var config = new GameConfig();
-        GameConfigValidator.Validate(config);
-    }
+        => GameConfigValidator.Validate(_config);
 
     [Fact(DisplayName = "Сумма вероятностей spawn-правил не равна 1 — конфиг отклоняется")]
     public void ProbabilitiesNotSummingToOneAreRejected()
     {
-        var config = new GameConfig()
-        { 
-            SpawnRules = 
+        var config = _config with 
+        {
+            SpawnRules =
             [
-                new ProbabilityRule(1, 0.85m),
-                new ProbabilityRule(2, 0.099999999999999999m),
-                new ProbabilityRule(4, 0.05m),
-            ] 
+                new ProbabilityRule(1, 0.859m),
+                new ProbabilityRule(2, 0.10m),
+                new ProbabilityRule(4, 0.05m)
+            ]
         };
 
         Assert.Throws<ArgumentException>(
@@ -32,7 +42,7 @@ public class ConfigValidationTest
     [Fact(DisplayName = "movesLimit <= 0 — конфиг отклоняется")]
     public void NonPositiveMovesLimitIsRejected()
     {
-        var config = new GameConfig() 
+        var config = _config with 
         { 
             MovesLimit = -2 
         };
@@ -44,7 +54,7 @@ public class ConfigValidationTest
     [Fact(DisplayName = "Пустой список spawn-правил — конфиг отклоняется")]
     public void EmptySpawnRulesAreRejected()
     {
-        var config = new GameConfig()
+        var config = _config with
         {
             SpawnRules = []
         };

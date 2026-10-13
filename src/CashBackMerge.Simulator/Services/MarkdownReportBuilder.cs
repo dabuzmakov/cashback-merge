@@ -28,7 +28,7 @@ public class MarkdownReportBuilder
         return this;
     }
 
-    private static string CreateReport(CampaignStatistics statistics)
+    public static string CreateReport(CampaignStatistics statistics)
     {
         var report = new StringBuilder();
 

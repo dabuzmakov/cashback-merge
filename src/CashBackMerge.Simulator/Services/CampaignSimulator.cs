@@ -10,23 +10,27 @@ namespace CashBackMerge.Simulator.Services;
 public class CampaignSimulator
 {
     private readonly CampaignConfig _campaignConfig;
-    private readonly GameController _controller;
+    private readonly GameConfig _gameConfig;
     private readonly IGameStrategy _gameStrategy;
+    private readonly int _seed;
 
     public CampaignSimulator(
         CampaignConfig campaignConfig, 
         GameConfig gameConfig,
         int seed)
     {
-        _controller = new GameController(gameConfig, seed);
-
         CampaignConfigValidator.Validate(campaignConfig);
+
         _campaignConfig = campaignConfig;
+        _gameConfig = gameConfig;
+        _seed = seed;
         _gameStrategy = StrategyMapper.Get(_campaignConfig.StrategyName);
     }
 
     public CampaignStatistics Run()
     {
+        var _controller = new GameController(_gameConfig, _seed);
+
         var rewardDistribution = new Dictionary<int, int>();
         var (totalScore, maxScore, totalReward) = (0, 0, 0);
 
@@ -46,12 +50,12 @@ public class CampaignSimulator
         }
 
         return new CampaignStatistics(
-            _controller.Config,
-            _campaignConfig,
-            (decimal)totalScore / _campaignConfig.PlayersCount,
-            maxScore,
-            (decimal)totalReward / _campaignConfig.PlayersCount,
-            rewardDistribution
+            GameConfig: _controller.Config,
+            CampaignConfig: _campaignConfig,
+            AverageScore: (decimal)totalScore / _campaignConfig.PlayersCount,
+            MaxScore: maxScore,
+            AverageReward: (decimal)totalReward / _campaignConfig.PlayersCount,
+            RewardDistribution: rewardDistribution
         );
     }
 }
