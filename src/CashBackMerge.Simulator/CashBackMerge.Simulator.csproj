@@ -12,4 +12,11 @@
     <ProjectReference Include="..\CashBackMerge.Game\CashBackMerge.Game.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="JsonConfigurations\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+	
 </Project>

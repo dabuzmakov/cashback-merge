@@ -26,7 +26,11 @@ public class GameSession
         InitializeBoard();
 
         var state = config.DeterminedStringState;
-        if (state != null) Board = Board.FromString(state);
+        if (state != null) Board = Board.FromString(
+            state, 
+            config.MapSize, 
+            config.MaxRewardCashback
+        );
     }
 
     public void ApplyMove(Direction direction)

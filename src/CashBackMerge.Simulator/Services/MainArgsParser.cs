@@ -6,10 +6,10 @@ public static class MainArgsParser
 {
     public static LaunchSettings Parse(string[] args)
     {
-        string? gameConfig = null;
-        string? campaignConfig = null;
+        string? gameConfigName = null;
+        string? campaignConfigName = null;
         int? seed = null;
-        string? output = null;
+        string? outputFileName = null;
 
         for (var i = 0; i < args.Length; i++)
         {
@@ -20,11 +20,11 @@ public static class MainArgsParser
             switch (args[i])
             {
                 case "--game":
-                    gameConfig = args[++i];
+                    gameConfigName = args[++i];
                     break;
 
                 case "--campaign":
-                    campaignConfig = args[++i];
+                    campaignConfigName = args[++i];
                     break;
 
                 case "--seed":
@@ -35,7 +35,7 @@ public static class MainArgsParser
                     break;
 
                 case "--output":
-                    output = args[++i];
+                    outputFileName = args[++i];
                     break;
 
                 default:
@@ -43,17 +43,17 @@ public static class MainArgsParser
             }
         }
 
-        if (string.IsNullOrWhiteSpace(gameConfig))
+        if (string.IsNullOrWhiteSpace(gameConfigName))
             throw new ArgumentException("Не указан --game");
 
-        if (string.IsNullOrWhiteSpace(campaignConfig))
+        if (string.IsNullOrWhiteSpace(campaignConfigName))
             throw new ArgumentException("Не указан --campaign");
 
         return new LaunchSettings(
-            gameConfig,
-            campaignConfig,
+            gameConfigName,
+            campaignConfigName,
             seed ?? new Random().Next(),
-            output ?? "report.md"
+            outputFileName ?? "report.md"
         );
     }
 }

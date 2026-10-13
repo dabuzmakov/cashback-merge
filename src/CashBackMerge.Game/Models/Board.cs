@@ -168,10 +168,9 @@ public class Board
         return builder.ToString();
     }
 
-    public static Board FromString(string stringBoard)
+    public static Board FromString(string stringBoard, int size, int maxReward)
     {
-        var config = new GameConfig();
-        var board = new Board(config.MapSize, config.MaxRewardCashback);
+        var board = new Board(size, maxReward);
 
         var rows = stringBoard.Split("\r\n");
 

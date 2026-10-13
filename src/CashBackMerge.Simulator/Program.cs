@@ -6,12 +6,17 @@ namespace CashBackMerge.Simulator;
 
 public class Program
 {
+    private const string _configDirectory = "JsonConfigurations";
+
     public static void Main(string[] args)
     {
         var launchSettings = MainArgsParser.Parse(args);
 
-        var gameConfig = GameConfig.FromJson(launchSettings.GameConfigName);
-        var campaignConfig = CampaignConfig.FromJson(launchSettings.CampaignConfigName);
+        var configPath = Path.Combine(AppContext.BaseDirectory, _configDirectory);
+        var configBuilder = new ConfigurationBuilder().SetBasePath(configPath);
+
+        var gameConfig = configBuilder.Get<GameConfig>(launchSettings.GameConfigName);
+        var campaignConfig = configBuilder.Get<CampaignConfig>(launchSettings.CampaignConfigName);
 
         var simulator = new CampaignSimulator(campaignConfig, gameConfig, launchSettings.Seed);
         var reportBuilder = new MarkdownReportBuilder(launchSettings.OutputFileName);

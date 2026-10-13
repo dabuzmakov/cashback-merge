@@ -27,6 +27,6 @@ public class CampaignSimulator
         for (var i = 0; i < _campaignConfig.PlayersCount; i++)
         {
             var session = _controller.CreateNewGame();
-        }
+        };
     }
 }
