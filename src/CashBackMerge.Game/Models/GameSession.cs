@@ -43,7 +43,7 @@ public class GameSession
         Score += moveResult.ScoreGained;
 
         var spawned = new Tile(_spawnRandom.Next());
-        var empty = GetRandomPosition();
+        var empty = GetRandomPosition(_board);
         _board[empty.Row, empty.Col] = spawned;
 
         if (UsedMoves >= _config.MovesLimit || !_board.HasAvailableMove())
@@ -62,16 +62,16 @@ public class GameSession
 
         foreach (var cashback in initialState)
         {
-            var empty = GetRandomPosition();
+            var empty = GetRandomPosition(board);
             board[empty.Row, empty.Col] = new Tile(cashback);
         }
 
         return board;
     }
 
-    private (int Row, int Col) GetRandomPosition()
+    private (int Row, int Col) GetRandomPosition(Board board)
     {
-        var emptyCells = _board.GetEmptyPositions();
+        var emptyCells = board.GetEmptyPositions();
 
         if (emptyCells.Count == 0)
             throw new InvalidOperationException("На доске нет свободных позиций");

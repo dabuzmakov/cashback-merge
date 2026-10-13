@@ -5,7 +5,8 @@ public static class StrategyMapper
     private static readonly Dictionary<string, IGameStrategy> Strategies =
         new(StringComparer.OrdinalIgnoreCase)
         {
-            ["random"] = new RandomStrategy()
+            ["random"] = new RandomStrategy(),
+            ["circle"] = new CircleStrategy()
         };
 
     public static bool TryGetValue(string name, out IGameStrategy strategy)
