@@ -1,7 +1,9 @@
 ﻿using CashBackMerge.Game.Configuration;
+using CashBackMerge.Game.Models;
 using CashBackMerge.Game.Services;
 using CashBackMerge.Simulator.Configuration;
 using CashBackMerge.Simulator.Models;
+using CashBackMerge.Simulator.Strategies;
 
 namespace CashBackMerge.Simulator.Services;
 
@@ -9,24 +11,47 @@ public class CampaignSimulator
 {
     private readonly CampaignConfig _campaignConfig;
     private readonly GameController _controller;
+    private readonly IGameStrategy _gameStrategy;
 
     public CampaignSimulator(
         CampaignConfig campaignConfig, 
         GameConfig gameConfig,
         int seed)
     {
-        _campaignConfig = campaignConfig;
         _controller = new GameController(gameConfig, seed);
+
+        CampaignConfigValidator.Validate(campaignConfig);
+        _campaignConfig = campaignConfig;
+        _gameStrategy = StrategyMapper.Get(_campaignConfig.StrategyName);
     }
 
     public CampaignStatistics Run()
     {
-        var rewardDistribution = new Dictionary<int, (int Players, int Rate)>();
+        var rewardDistribution = new Dictionary<int, int>();
         var (totalScore, maxScore, totalReward) = (0, 0, 0);
-        
+
         for (var i = 0; i < _campaignConfig.PlayersCount; i++)
         {
             var session = _controller.CreateNewGame();
-        };
+
+            while (session.Status == GameStatus.InProgress)
+                session.ApplyMove(_gameStrategy.GetNextMove(session));
+
+            var (score, reward) = (session.Score, session.Reward);
+
+            totalScore += score;
+            totalReward += reward;
+            maxScore = Math.Max(maxScore, score);
+            rewardDistribution[reward] = rewardDistribution.GetValueOrDefault(reward) + 1;
+        }
+
+        return new CampaignStatistics(
+            _controller.Config,
+            _campaignConfig,
+            (decimal)totalScore / _campaignConfig.PlayersCount,
+            maxScore,
+            (decimal)totalReward / _campaignConfig.PlayersCount,
+            rewardDistribution
+        );
     }
 }

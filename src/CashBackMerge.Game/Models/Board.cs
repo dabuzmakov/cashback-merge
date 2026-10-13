@@ -82,6 +82,17 @@ public class Board
         return emptyCells;
     }
 
+    public int GetMaxTileValue()
+    {
+        var maxValue = 0;
+
+        foreach (var tile in _board)
+            if (tile.HasValue) 
+                maxValue = Math.Max(maxValue, tile.Value.Cashback);
+
+        return maxValue;
+    }
+
     private List<Tile?> ReadLine(Direction direction, int fixedIndex)
     {
         var line = new List<Tile?>(Size);

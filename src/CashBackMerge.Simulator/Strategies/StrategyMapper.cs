@@ -15,4 +15,7 @@ public static class StrategyMapper
         strategy = gameStrategy;
         return exists;
     }
+
+    public static IGameStrategy Get(string name)
+        => Strategies[name];
 }

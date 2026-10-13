@@ -9,7 +9,6 @@ public record CampaignStatistics(
     decimal AverageScore,
     int MaxScore,
     decimal AverageReward,
-    Dictionary<int, (int Players, int Rate)> RewardDistribution)
+    Dictionary<int, int> RewardDistribution)
 {
-
 }
