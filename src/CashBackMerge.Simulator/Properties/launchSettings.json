@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CashBackMerge.Simulator": {
+      "commandName": "Project",
+      "commandLineArgs": "--game defaultGame.json --campaign defaultCampaign.json"
+    }
+  }
+}

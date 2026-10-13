@@ -1,0 +1,5 @@
+{
+  "playersCount": 10000,
+  "strategyName": "random",
+  "maxRewardAllowedRate": 0.1
+}

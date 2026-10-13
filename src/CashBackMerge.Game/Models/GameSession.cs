@@ -5,64 +5,77 @@ namespace CashBackMerge.Game.Models;
 
 public class GameSession
 {
-    public GameConfig Config { get; }
+    private readonly Board _board;
+    private readonly Random _random;
+    private readonly WeightedRandom _spawnRandom;
+    private readonly GameConfig _config;
 
-    public Board Board { get; private set; }
     public int UsedMoves { get; private set; }
-    public GameStatus Status { get; private set; }
     public int Score { get; private set; }
+    public GameStatus Status { get; private set; }
 
-    private Random _random;
-    private WeightedRandom _spawnRandom;
+    public int Reward => _board.GetMaxTileValue();
+    public string StringBoard => _board.ToString();
+    public int EmptyTilesCount => _board.GetEmptyPositions().Count;
 
     internal GameSession(GameConfig config, int seed)
     {
-        Config = config;
+        _config = config;
         _random = new Random(seed);
-        _spawnRandom = new WeightedRandom(Config.SpawnRules.ToList(), _random);
+        _spawnRandom = new WeightedRandom(_config.SpawnRules.ToList(), _random);
+
+        _board = InitializeBoard(
+            _config.DeterminedStringState, 
+            _config.InitialState, 
+            _config.MapSize, 
+            _config.MaxRewardCashback);
 
         Status = GameStatus.InProgress;
-        Score = config.InitialState.Sum();
-
-        InitializeBoard();
-
-        var state = config.DeterminedStringState;
-        if (state != null) Board = Board.FromString(state);
+        (Score, UsedMoves) = (0, 0);
     }
 
     public void ApplyMove(Direction direction)
     {
         if (Status != GameStatus.InProgress)
             throw new InvalidOperationException("Завершённая сессия не принимает попытки");
+        
+        var moveResult = _board.TryMove(direction);
 
-        if (!Board.TryMove(direction))
-            return;
-
-        var spawned = new Tile(_spawnRandom.Next());
-        var empty = GetRandomPosition();
-        Board[empty.Row, empty.Col] = spawned;
+        if (!moveResult.Changed) return;
 
         UsedMoves++;
-        Score += spawned.Cashback;
+        Score += moveResult.ScoreGained;
 
-        if (UsedMoves >= Config.MovesLimit || !Board.HasAvailableMove())
+        var spawned = new Tile(_spawnRandom.Next());
+        var empty = GetRandomPosition(_board);
+        _board[empty.Row, empty.Col] = spawned;
+
+        if (UsedMoves >= _config.MovesLimit || !_board.HasAvailableMove())
             Status = GameStatus.End;
     }
 
-    private void InitializeBoard()
+    private Board InitializeBoard(
+        string? stringState, 
+        IReadOnlyList<int> initialState, 
+        int size, int maxReward)
     {
-        Board = new Board(Config.MapSize, Config.MaxRewardCashback);
+        if (stringState != null)
+            return Board.FromString(stringState, size, maxReward);
 
-        foreach (var cashback in Config.InitialState)
+        var board = new Board(size, maxReward);
+
+        foreach (var cashback in initialState)
         {
-            var empty = GetRandomPosition();
-            Board[empty.Row, empty.Col] = new Tile(cashback);
+            var empty = GetRandomPosition(board);
+            board[empty.Row, empty.Col] = new Tile(cashback);
         }
+
+        return board;
     }
 
-    private (int Row, int Col) GetRandomPosition()
+    private (int Row, int Col) GetRandomPosition(Board board)
     {
-        var emptyCells = Board.GetEmptyPositions();
+        var emptyCells = board.GetEmptyPositions();
 
         if (emptyCells.Count == 0)
             throw new InvalidOperationException("На доске нет свободных позиций");

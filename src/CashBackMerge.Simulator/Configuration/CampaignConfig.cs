@@ -1,10 +1,10 @@
-﻿using CashBackMerge.Simulator.Strategies;
+﻿using CashBackMerge.Game.Configuration;
 
 namespace CashBackMerge.Simulator.Configuration;
 
-public class CampaignConfig
+public record CampaignConfig(
+    decimal MaxRewardAllowedRate,
+    string StrategyName,
+    int PlayersCount) : IConfig
 {
-    public int PlayerCount { get; init; }
-    public IGameStrategy Strategy { get; init; }
-    public double MaxRewardAllowedRate { get; init; }
 }

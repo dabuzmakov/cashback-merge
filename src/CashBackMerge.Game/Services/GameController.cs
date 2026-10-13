@@ -12,6 +12,8 @@ public class GameController
     {
         _sessionSeedRandom = new Random(seed);
         Config = config;
+
+        GameConfigValidator.Validate(config);
     }
 
     public GameSession CreateNewGame(int? seed = null)

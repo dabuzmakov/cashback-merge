@@ -7,10 +7,23 @@ namespace CashBackMerge.Tests.Mandatory.Mr2;
 /// <summary>Обязательные тесты: движок ходов — что считается ходом и что после него происходит.</summary>
 public class MoveEngineTest
 {
+    private readonly GameConfig _config = new GameConfig(
+        MapSize: 4,
+        MovesLimit: 40,
+        MaxRewardCashback: 32,
+        InitialState: [1, 1],
+        SpawnRules:
+        [
+            new ProbabilityRule(1, 0.85m),
+            new ProbabilityRule(2, 0.10m),
+            new ProbabilityRule(4, 0.05m)
+        ]
+    );
+
     [Fact(DisplayName = "Невалидный ход не меняет поле, не тратит ход и не создаёт плитку")]
     public void InvalidMoveChangesNothing()
     {
-        var config = new GameConfig
+        var config = _config with
         {
             DeterminedStringState =
                "1,2,4,8\r\n" +
@@ -23,18 +36,18 @@ public class MoveEngineTest
         var controller = new GameController(config, seed);
         var session = controller.CreateNewGame();
 
-        var before = session.Board.ToString();
+        var before = session.StringBoard;
 
         session.ApplyMove(Direction.Left);
 
-        Assert.Equal(before, session.Board.ToString());
+        Assert.Equal(before, session.StringBoard);
         Assert.Equal(0, session.UsedMoves);
     }
 
     [Fact(DisplayName = "После валидного хода появляется ровно одна новая плитка")]
     public void ValidMoveSpawnsExactlyOneTile()
     {
-        var config = new GameConfig
+        var config = _config with
         {
             DeterminedStringState =
                 "1,1,2,4\r\n" +
@@ -47,9 +60,9 @@ public class MoveEngineTest
         var controller = new GameController(config, seed);
         var session = controller.CreateNewGame();
 
-        var emptyCount = session.Board.GetEmptyPositions().Count;
+        var emptyCount = session.EmptyTilesCount;
         session.ApplyMove(Direction.Left);
-        var newEmptyCount = session.Board.GetEmptyPositions().Count;
+        var newEmptyCount = session.EmptyTilesCount;
 
         Assert.Equal(emptyCount, newEmptyCount);
     }
@@ -57,7 +70,7 @@ public class MoveEngineTest
     [Fact(DisplayName = "После N валидных ходов игра завершена")]
     public void GameEndsAfterMovesLimit()
     {
-        var config = new GameConfig
+        var config = _config with
         {
             MovesLimit = 2,
             DeterminedStringState =
@@ -81,7 +94,7 @@ public class MoveEngineTest
     [Fact(DisplayName = "Достижение плитки 32% не заканчивает игру — доигрываем до лимита ходов")]
     public void ReachingMaxTileDoesNotEndGame()
     {
-        var config = new GameConfig
+        var config = _config with
         {
             MovesLimit = 2,
             MaxRewardCashback = 32,
@@ -106,10 +119,10 @@ public class MoveEngineTest
         Assert.Equal(GameStatus.End, session.Status);
     }
 
-    [Fact(DisplayName = "Score увеличивается с каждым ходом на значение новой плитки")]
+    [Fact(DisplayName = "Score увеличивается на значение объединённой плитки")]
     public void ScoreIsCalculatedOnMerges()
     {
-        var config = new GameConfig
+        var config = _config with
         {
             DeterminedStringState =
             "1,1,.,.\r\n" +
@@ -126,9 +139,6 @@ public class MoveEngineTest
 
         session.ApplyMove(Direction.Left);
 
-        var difference = session.Score - initialScore;
-
-        Assert.Contains(difference, config.SpawnRules.Select(rule => rule.Value));
-        Assert.Equal(1, session.UsedMoves);
+        Assert.Equal(2, session.Score - initialScore);
     }
 }

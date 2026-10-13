@@ -1,4 +1,3 @@
-using CashBackMerge.Game.Configuration;
 using CashBackMerge.Game.Models;
 
 namespace CashBackMerge.Tests.Mandatory.Mr2;
@@ -38,7 +37,7 @@ public class MergeRulesTest
 
     private static void AssertMove(string before, string expected, Direction direction)
     {
-        var board = Board.FromString(before);
+        var board = Board.FromString(before, size: 4, maxReward: 32);
 
         board.TryMove(direction);
 
