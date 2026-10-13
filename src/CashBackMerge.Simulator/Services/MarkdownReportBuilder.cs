@@ -67,7 +67,7 @@ public class MarkdownReportBuilder
 
         report.AppendLine($"- Количество игроков: {campaign.PlayersCount}");
         report.AppendLine($"- Стратегия выбора хода: {campaign.StrategyName}");
-        report.AppendLine($"- Ожидаемая доля максимальных наград: {campaign.MaxRewardAllowedRate}");
+        report.AppendLine($"- Ожидаемая доля максимальных наград: {campaign.MaxRewardAllowedRate * 100}%");
 
         report.AppendLine();
     }
