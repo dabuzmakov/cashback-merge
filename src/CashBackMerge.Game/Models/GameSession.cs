@@ -16,6 +16,7 @@ public class GameSession
 
     public int Reward => _board.GetMaxTileValue();
     public string StringBoard => _board.ToString();
+    public int EmptyTilesCount => _board.GetEmptyPositions().Count;
 
     internal GameSession(GameConfig config, int seed)
     {
