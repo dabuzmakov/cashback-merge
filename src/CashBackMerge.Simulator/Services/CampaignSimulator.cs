@@ -24,10 +24,9 @@ public class CampaignSimulator
         var rewardDistribution = new Dictionary<int, (int Players, int Rate)>();
         var (totalScore, maxScore, totalReward) = (0, 0, 0);
         
-        for (var i = 0; i < _campaignConfig.PlayersCount)
+        for (var i = 0; i < _campaignConfig.PlayersCount; i++)
         {
             var session = _controller.CreateNewGame();
-            
         }
     }
 }
