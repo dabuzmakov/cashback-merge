@@ -9,6 +9,8 @@ public class ConfigurationBuilder
 
     public ConfigurationBuilder SetBasePath(string path)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path);
+
         _basePath = path;
         return this;
     }
@@ -16,6 +18,8 @@ public class ConfigurationBuilder
     public TConfig Get<TConfig>(string fileName)
         where TConfig : IConfig
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+
         var path = Path.Combine(_basePath, fileName);
 
         using var stream = File.OpenRead(path);
