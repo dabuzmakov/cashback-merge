@@ -33,7 +33,7 @@ public class MoveEngineTest
         };
 
         var seed = Random.Shared.Next();
-        var controller = new GameController(config, seed);
+        var controller = new GameFactory(config, seed);
         var session = controller.CreateNewGame();
 
         var before = session.StringBoard;
@@ -57,7 +57,7 @@ public class MoveEngineTest
         };
 
         var seed = Random.Shared.Next();
-        var controller = new GameController(config, seed);
+        var controller = new GameFactory(config, seed);
         var session = controller.CreateNewGame();
 
         var emptyCount = session.EmptyTilesCount;
@@ -81,7 +81,7 @@ public class MoveEngineTest
         };
 
         var seed = Random.Shared.Next();
-        var controller = new GameController(config, seed);
+        var controller = new GameFactory(config, seed);
         var session = controller.CreateNewGame();
 
         session.ApplyMove(Direction.Left);
@@ -106,7 +106,7 @@ public class MoveEngineTest
         };
 
         var seed = Random.Shared.Next();
-        var controller = new GameController(config, seed);
+        var controller = new GameFactory(config, seed);
         var session = controller.CreateNewGame();
 
         session.ApplyMove(Direction.Left);
@@ -132,7 +132,7 @@ public class MoveEngineTest
         };
 
         var seed = Random.Shared.Next();
-        var controller = new GameController(config, seed);
+        var controller = new GameFactory(config, seed);
         var session = controller.CreateNewGame();
 
         var initialScore = session.Score;

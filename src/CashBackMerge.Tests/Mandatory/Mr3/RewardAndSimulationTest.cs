@@ -42,7 +42,7 @@ public class RewardAndSimulationTest
             ".,.,.,."
         };
 
-        var controller = new GameController(config, seed: 67);
+        var controller = new GameFactory(config, seed: 67);
         var session = controller.CreateNewGame();
 
         Assert.Equal(maxTileOnBoard, session.Reward);

@@ -19,6 +19,7 @@ public class CampaignSimulator
         int seed)
     {
         CampaignConfigValidator.Validate(campaignConfig);
+        GameConfigValidator.Validate(gameConfig);
 
         _campaignConfig = campaignConfig;
         _gameConfig = gameConfig;
@@ -28,14 +29,14 @@ public class CampaignSimulator
     public CampaignStatistics Run()
     {
         var gameStrategy = StrategyMapper.Get(_campaignConfig.StrategyName);
-        var controller = new GameController(_gameConfig, _seed);
+        var gameFactory = new GameFactory(_gameConfig, _seed);
 
         var rewardDistribution = new Dictionary<int, int>();
         var (totalScore, maxScore, totalReward) = (0, 0, 0);
 
         for (var i = 0; i < _campaignConfig.PlayersCount; i++)
         {
-            var session = controller.CreateNewGame();
+            var session = gameFactory.CreateNewGame();
 
             while (session.Status == GameStatus.InProgress)
                 session.ApplyMove(gameStrategy.GetNextMove(session));
@@ -49,7 +50,7 @@ public class CampaignSimulator
         }
 
         return new CampaignStatistics(
-            GameConfig: controller.Config,
+            GameConfig: _gameConfig,
             CampaignConfig: _campaignConfig,
             AverageScore: (decimal)totalScore / _campaignConfig.PlayersCount,
             MaxScore: maxScore,

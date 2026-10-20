@@ -26,7 +26,7 @@ public class SeedTest
     public void SameConfigAndSeedProduceSameInitialBoard()
     {
         var seed = 67;
-        var controller = new GameController(_config, seed);
+        var controller = new GameFactory(_config, seed);
 
         var session1 = controller.CreateNewGame(seed);
         var session2 = controller.CreateNewGame(seed);

@@ -3,23 +3,21 @@ using CashBackMerge.Game.Models;
 
 namespace CashBackMerge.Game.Services;
 
-public class GameController
+public class GameFactory
 {
-    public GameConfig Config { get; }
+    private readonly GameConfig _config;
     private readonly Random _sessionSeedRandom;
 
-    public GameController(GameConfig config, int seed)
+    public GameFactory(GameConfig config, int seed)
     {
         _sessionSeedRandom = new Random(seed);
-        Config = config;
-
-        GameConfigValidator.Validate(config);
+        _config = config;
     }
 
     public GameSession CreateNewGame(int? seed = null)
     {
         seed ??= _sessionSeedRandom.Next();
 
-        return new GameSession(Config, (int)seed);
+        return new GameSession(_config, (int)seed);
     }
 }
