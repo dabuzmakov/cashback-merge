@@ -1,6 +1,5 @@
 ﻿using CashBackMerge.Game.Configuration;
 using CashBackMerge.Game.Models;
-using CashBackMerge.Game.Services;
 using CashBackMerge.Simulator.Configuration;
 using CashBackMerge.Simulator.Models;
 using CashBackMerge.Simulator.Strategies;
@@ -11,7 +10,7 @@ public class CampaignSimulator
 {
     private readonly CampaignConfig _campaignConfig;
     private readonly GameConfig _gameConfig;
-    private readonly int _seed;
+    private readonly Random _seedGenerator;
 
     public CampaignSimulator(
         CampaignConfig campaignConfig, 
@@ -23,20 +22,20 @@ public class CampaignSimulator
 
         _campaignConfig = campaignConfig;
         _gameConfig = gameConfig;
-        _seed = seed;
+        _seedGenerator = new Random(seed);
     }
 
     public CampaignStatistics Run()
     {
         var gameStrategy = StrategyMapper.Get(_campaignConfig.StrategyName);
-        var gameFactory = new GameFactory(_gameConfig, _seed);
 
         var rewardDistribution = new Dictionary<int, int>();
         var (totalScore, maxScore, totalReward) = (0, 0, 0);
 
         for (var i = 0; i < _campaignConfig.PlayersCount; i++)
         {
-            var session = gameFactory.CreateNewGame();
+            var seed = _seedGenerator.Next();
+            var session = new GameSession(_gameConfig, seed);
 
             while (session.Status == GameStatus.InProgress)
                 session.ApplyMove(gameStrategy.GetNextMove(session));

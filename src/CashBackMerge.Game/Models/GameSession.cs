@@ -18,7 +18,7 @@ public class GameSession
     public string StringBoard => _board.ToString();
     public int EmptyTilesCount => _board.GetEmptyPositions().Count;
 
-    internal GameSession(GameConfig config, int seed)
+    public GameSession(GameConfig config, int seed)
     {
         _config = config;
         _random = new Random(seed);
