@@ -10,7 +10,7 @@ public class CampaignSimulator
 {
     private readonly CampaignConfig _campaignConfig;
     private readonly GameConfig _gameConfig;
-    private readonly Random _seedGenerator;
+    private readonly int _seed;
 
     public CampaignSimulator(
         CampaignConfig campaignConfig, 
@@ -21,11 +21,12 @@ public class CampaignSimulator
 
         _campaignConfig = campaignConfig;
         _gameConfig = gameConfig;
-        _seedGenerator = new Random(seed);
+        _seed = seed;
     }
 
     public CampaignStatistics Run()
     {
+        var seedGenerator = new Random(_seed);
         var gameStrategy = StrategyMapper.Get(_campaignConfig.StrategyName);
 
         var rewardDistribution = new Dictionary<int, int>();
@@ -33,7 +34,7 @@ public class CampaignSimulator
 
         for (var i = 0; i < _campaignConfig.PlayersCount; i++)
         {
-            var seed = _seedGenerator.Next();
+            var seed = seedGenerator.Next();
             var session = new GameSession(_gameConfig, seed);
 
             while (session.Status == GameStatus.InProgress)

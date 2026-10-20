@@ -1,4 +1,5 @@
 using CashBackMerge.Game.Configuration;
+using CashBackMerge.Game.Models;
 using CashBackMerge.Game.Services;
 
 using CashBackMerge.Simulator.Configuration;
@@ -33,18 +34,16 @@ public class RewardAndSimulationTest
     {
         var maxTileOnBoard = 16;
 
-        var config = _gameConfig with
-        {
-            DeterminedStringState =
-            $"{maxTileOnBoard},.,.,.\r\n" +
-            ".,.,.,.\r\n" +
-            ".,.,.,.\r\n" +
-            ".,.,.,."
-        };
+        var board = new Board(_gameConfig.MapSize, _gameConfig.MaxRewardCashback)
+            .WithFixedState(new int[,]
+            {
+                { 16, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 }
+            });
 
-        var controller = new GameFactory(config, seed: 67);
-        var session = controller.CreateNewGame();
-
+        var session = new GameSession(_gameConfig, seed: 67, board);
         Assert.Equal(maxTileOnBoard, session.Reward);
     }
 
@@ -77,9 +76,9 @@ public class RewardAndSimulationTest
         var report = MakeFailedReport();
 
         Assert.Contains("- Распределение наград:", report);
-        Assert.Contains("    8: 324 (3,24%)", report);
-        Assert.Contains("    16: 8039 (80,39%)", report);
-        Assert.Contains("    32: 1637 (16,37%)", report);
+        Assert.Contains("    8: 314 (3,14%)", report);
+        Assert.Contains("    16: 8011 (80,11%)", report);
+        Assert.Contains("    32: 1675 (16,75%)", report);
     }
 
     [Fact(DisplayName = "Отчёт содержит долю игроков с максимальной наградой")]
@@ -87,7 +86,7 @@ public class RewardAndSimulationTest
     {
         var report = MakeFailedReport();
 
-        Assert.Contains("- Доля игроков с максимальной наградой: 16,37%", report);
+        Assert.Contains("- Доля игроков с максимальной наградой: 16,75%", report);
     }
 
     [Fact(DisplayName = "Статус OK, если actualMaxRewardRate <= maxRewardAllowedRate, иначе FAILED")]
