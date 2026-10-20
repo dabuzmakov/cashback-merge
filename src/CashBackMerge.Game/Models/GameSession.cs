@@ -20,9 +20,11 @@ public class GameSession
 
     public GameSession(GameConfig config, int seed)
     {
+        GameConfigValidator.Validate(config);
+
         _config = config;
         _random = new Random(seed);
-        _spawnRandom = new WeightedRandom(_config.SpawnRules.ToList(), _random);
+        _spawnRandom = new WeightedRandom(_config.SpawnRules, _random);
 
         _board = InitializeBoard(
             _config.DeterminedStringState, 

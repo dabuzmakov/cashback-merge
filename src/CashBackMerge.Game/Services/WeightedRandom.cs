@@ -1,28 +1,28 @@
 ﻿using CashBackMerge.Game.Configuration;
-using CashBackMerge.Game.Extensions;
 
 namespace CashBackMerge.Game.Services;
 
 public class WeightedRandom
 {
+    private const int _probabilityScale = 100;
+    private readonly List<(int Value, int Weight)> _weightedRules;
     private readonly Random _random;
-    private readonly List<(int Value, long Weight)> _normalizedRules;
-    private readonly long _totalWeight;
 
-    public WeightedRandom(List<ProbabilityRule> rules, Random random)
+    public WeightedRandom(IReadOnlyList<ProbabilityRule> rules, Random random)
     {
         _random = random;
-        _normalizedRules = rules.ToWeightedValues();
-        _totalWeight = _normalizedRules.Sum(rule => rule.Weight);
+
+        _weightedRules = rules
+            .Select(rule => (rule.Value, (int)(rule.Probability * _probabilityScale)))
+            .ToList();
     }
 
     public int Next()
     {
-        var weight = _random.NextInt64(_totalWeight);
+        var weight = _random.Next(_probabilityScale);   
+        var cumulativeWeight = 0;
 
-        long cumulativeWeight = 0;
-
-        foreach (var rule in _normalizedRules)
+        foreach (var rule in _weightedRules)
         {
             cumulativeWeight += rule.Weight;
 

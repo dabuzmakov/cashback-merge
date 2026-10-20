@@ -18,7 +18,6 @@ public class CampaignSimulator
         int seed)
     {
         CampaignConfigValidator.Validate(campaignConfig);
-        GameConfigValidator.Validate(gameConfig);
 
         _campaignConfig = campaignConfig;
         _gameConfig = gameConfig;
