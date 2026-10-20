@@ -1,7 +1,6 @@
 using CashBackMerge.Game.Configuration;
-using CashBackMerge.Game.Services;
+using CashBackMerge.Game.Models;
 using CashBackMerge.Simulator.Configuration;
-using CashBackMerge.Simulator.Models;
 using CashBackMerge.Simulator.Services;
 
 namespace CashBackMerge.Tests.Mandatory.Mr1;
@@ -26,12 +25,11 @@ public class SeedTest
     public void SameConfigAndSeedProduceSameInitialBoard()
     {
         var seed = 67;
-        var controller = new GameFactory(_config, seed);
 
-        var session1 = controller.CreateNewGame(seed);
-        var session2 = controller.CreateNewGame(seed);
+        var session1 = new GameSession(_config, seed);
+        var session2 = new GameSession(_config, seed);
 
-        Assert.Equal(session1.StringBoard, session2.StringBoard);
+        Assert.Equal(session1.BoardSnapshot, session2.BoardSnapshot);
     }
 
     [Fact(DisplayName = "Одинаковый конфиг, seed и стратегия дают одинаковый отчёт симуляции")]

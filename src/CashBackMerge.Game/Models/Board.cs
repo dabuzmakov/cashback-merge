@@ -23,6 +23,17 @@ public class Board
         return board;
     }
 
+    public Board Clone()
+    {
+        var cloned = new Board(Size, MaxRewardCashback);
+
+        for (var row = 0; row < Size; row++)
+            for (var col = 0; col < Size; col++)
+                cloned[row, col] = _board[row, col];
+
+        return cloned;
+    }
+
     public MoveResult TryMove(Direction direction)
     {
         var changed = false;
@@ -92,6 +103,23 @@ public class Board
                 maxValue = Math.Max(maxValue, tile.Value.Cashback);
 
         return maxValue;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is not Board other)
+            return false;
+
+        if (Size != other.Size || 
+            MaxRewardCashback != other.MaxRewardCashback)
+            return false;
+
+        for (var row = 0; row < Size; row++)
+            for (var col = 0; col < Size; col++)
+                if (_board[row, col] != other[row, col])
+                    return false;
+
+        return true;
     }
 
     private Tile? this[int row, int column]
