@@ -7,7 +7,7 @@ namespace CashBackMerge.Tests.Mandatory.Mr2;
 /// <summary>Обязательные тесты: движок ходов — что считается ходом и что после него происходит.</summary>
 public class MoveEngineTest
 {
-    private readonly GameConfig _config = new GameConfig(
+    private static readonly GameConfig _config = new GameConfig(
         MapSize: 4,
         MovesLimit: 40,
         MaxRewardCashback: 32,
@@ -20,69 +20,67 @@ public class MoveEngineTest
         ]
     );
 
+    private static readonly Board _defaultBoard = 
+        new Board(_config.MapSize, _config.MaxRewardCashback);
+
     [Fact(DisplayName = "Невалидный ход не меняет поле, не тратит ход и не создаёт плитку")]
     public void InvalidMoveChangesNothing()
     {
-        var config = _config with
+        var board = _defaultBoard.WithFixedState(new int[,]
         {
-            DeterminedStringState =
-               "1,2,4,8\r\n" +
-               "2,4,8,1\r\n" +
-               "4,8,1,2\r\n" +
-               "8,1,2,4"
-        };
+            { 1, 2, 4, 8 },
+            { 2, 4, 8, 1 },
+            { 4, 8, 1, 2 },
+            { 8, 1, 2, 4 }
+        });
 
-        var seed = Random.Shared.Next();
-        var controller = new GameFactory(config, seed);
-        var session = controller.CreateNewGame();
-
-        var before = session.StringBoard;
+        var session = new GameSession(_config, seed: 67, board);
+        var before = session.BoardSnapshot;
 
         session.ApplyMove(Direction.Left);
 
-        Assert.Equal(before, session.StringBoard);
+        Assert.Equal(before, session.BoardSnapshot);
         Assert.Equal(0, session.UsedMoves);
     }
 
     [Fact(DisplayName = "После валидного хода появляется ровно одна новая плитка")]
     public void ValidMoveSpawnsExactlyOneTile()
     {
-        var config = _config with
+        var board = _defaultBoard.WithFixedState(new int[,]
         {
-            DeterminedStringState =
-                "1,1,2,4\r\n" +
-                ".,.,.,.\r\n" +
-                ".,.,.,.\r\n" +
-                ".,.,.,."
-        };
+            { 1, 1, 2, 4 },
+            { 0, 0, 0, 0 },
+            { 0, 0, 0, 0 },
+            { 0, 0, 0, 0 }
+        });
 
-        var seed = Random.Shared.Next();
-        var controller = new GameFactory(config, seed);
-        var session = controller.CreateNewGame();
+        var session = new GameSession(_config, seed: 67, board);
+        var emptyCount = session.BoardSnapshot
+            .GetEmptyPositions().Count();
 
-        var emptyCount = session.EmptyTilesCount;
         session.ApplyMove(Direction.Left);
-        var newEmptyCount = session.EmptyTilesCount;
 
+        var newEmptyCount = session.BoardSnapshot
+            .GetEmptyPositions().Count();
+
+        Assert.Equal(1, session.UsedMoves);
         Assert.Equal(emptyCount, newEmptyCount);
     }
 
     [Fact(DisplayName = "После N валидных ходов игра завершена")]
     public void GameEndsAfterMovesLimit()
     {
-        var config = _config with
-        {
-            MovesLimit = 2,
-            DeterminedStringState =
-                "1,1,2,.\r\n" +
-                "1,1,2,.\r\n" +
-                "1,1,2,.\r\n" +
-                "1,1,2,."
-        };
+        var config = _config with { MovesLimit = 2 };
 
-        var seed = Random.Shared.Next();
-        var controller = new GameFactory(config, seed);
-        var session = controller.CreateNewGame();
+        var board = _defaultBoard.WithFixedState(new int[,]
+        {
+            { 1, 1, 2, 0 },
+            { 1, 1, 2, 0 },
+            { 1, 1, 2, 0 },
+            { 1, 1, 2, 0 }
+        });
+
+        var session = new GameSession(config, seed: 67, board);
 
         session.ApplyMove(Direction.Left);
         session.ApplyMove(Direction.Left);
@@ -97,17 +95,18 @@ public class MoveEngineTest
         var config = _config with
         {
             MovesLimit = 2,
-            MaxRewardCashback = 32,
-            DeterminedStringState =
-                "16,16,2,4\r\n" +
-                ".,.,.,.\r\n" +
-                ".,.,.,.\r\n" +
-                ".,.,.,."
+            MaxRewardCashback = 32
         };
 
-        var seed = Random.Shared.Next();
-        var controller = new GameFactory(config, seed);
-        var session = controller.CreateNewGame();
+        var board = _defaultBoard.WithFixedState(new int[,]
+        {
+            { 16, 16, 2, 4 },
+            { 0, 0, 0, 0 },
+            { 0, 0, 0, 0 },
+            { 0, 0, 0, 0 }
+        });
+
+        var session = new GameSession(config, seed: 67, board);
 
         session.ApplyMove(Direction.Left);
 
@@ -122,19 +121,15 @@ public class MoveEngineTest
     [Fact(DisplayName = "Score увеличивается на значение объединённой плитки")]
     public void ScoreIsCalculatedOnMerges()
     {
-        var config = _config with
+        var board = _defaultBoard.WithFixedState(new int[,]
         {
-            DeterminedStringState =
-            "1,1,.,.\r\n" +
-            ".,.,.,.\r\n" +
-            ".,.,.,.\r\n" +
-            ".,.,.,."
-        };
+            { 1, 1, 0, 0 },
+            { 0, 0, 0, 0 },
+            { 0, 0, 0, 0 },
+            { 0, 0, 0, 0 }
+        });
 
-        var seed = Random.Shared.Next();
-        var controller = new GameFactory(config, seed);
-        var session = controller.CreateNewGame();
-
+        var session = new GameSession(_config, seed: 67, board);
         var initialScore = session.Score;
 
         session.ApplyMove(Direction.Left);

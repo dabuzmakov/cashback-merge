@@ -1,4 +1,6 @@
-﻿namespace CashBackMerge.Game.Models;
+﻿using System.Data;
+
+namespace CashBackMerge.Game.Models;
 
 public class Board
 {
@@ -19,6 +21,20 @@ public class Board
 
         foreach (var tile in initialTiles)
             board.TryPlaceRandom(tile, random);
+
+        return board;
+    }
+
+    public Board WithFixedState(int[,] tiles)
+    {
+        var board = new Board(Size, MaxRewardCashback);
+
+        for (var row = 0; row < Size; row++)
+        for (var col = 0; col < Size; col++)
+        {
+            var value = tiles[row, col];
+            board[row, col] = value == 0 ? null : new Tile(value);
+        }
 
         return board;
     }
@@ -105,6 +121,18 @@ public class Board
         return maxValue;
     }
 
+    public List<(int Row, int Col)> GetEmptyPositions()
+    {
+        var emptyCells = new List<(int Row, int Col)>();
+
+        for (var row = 0; row < Size; row++)
+            for (var col = 0; col < Size; col++)
+                if (this[row, col] is null)
+                    emptyCells.Add((row, col));
+
+        return emptyCells;
+    }
+
     public override bool Equals(object? obj)
     {
         if (obj is not Board other)
@@ -120,6 +148,19 @@ public class Board
                     return false;
 
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+
+        hash.Add(Size);
+        hash.Add(MaxRewardCashback);
+
+        foreach (var tile in _board)
+            hash.Add(tile);
+
+        return hash.ToHashCode();
     }
 
     private Tile? this[int row, int column]
@@ -191,17 +232,5 @@ public class Board
 
             this[row, col] = line[i];
         }
-    }
-
-    private List<(int Row, int Col)> GetEmptyPositions()
-    {
-        var emptyCells = new List<(int Row, int Col)>();
-
-        for (var row = 0; row < Size; row++)
-            for (var col = 0; col < Size; col++)
-                if (this[row, col] is null)
-                    emptyCells.Add((row, col));
-
-        return emptyCells;
     }
 }

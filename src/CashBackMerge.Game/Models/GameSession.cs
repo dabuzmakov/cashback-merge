@@ -1,5 +1,6 @@
 ﻿using CashBackMerge.Game.Configuration;
 using CashBackMerge.Game.Services;
+using System.Data;
 
 namespace CashBackMerge.Game.Models;
 
@@ -17,17 +18,17 @@ public class GameSession
     public int Reward => _board.GetMaxTileValue();
     public Board BoardSnapshot => _board.Clone();
 
-    public GameSession(GameConfig config, int seed)
+    public GameSession(
+        GameConfig config, 
+        int seed, 
+        Board? initialBoard = null)
     {
         GameConfigValidator.Validate(config);
 
         _config = config;
         _random = new Random(seed);
         _spawnRandom = new WeightedRandom(_config.SpawnRules, _random);
-
-        var initialTiles = _config.InitialState.Select(x => new Tile(x));
-        _board = new Board(_config.MapSize, _config.MaxRewardCashback)
-            .WithRandomPlaced(initialTiles, _random);
+        _board = InitializeBoard(initialBoard);
 
         Status = GameStatus.InProgress;
         (Score, UsedMoves) = (0, 0);
@@ -50,5 +51,24 @@ public class GameSession
 
         if (UsedMoves >= _config.MovesLimit || !_board.HasAvailableMove())
             Status = GameStatus.End;
+    }
+
+    private Board InitializeBoard(Board? initialBoard = null)
+    {
+        if (initialBoard == null)
+        {
+            var initialTiles = _config.InitialState.Select(x => new Tile(x));
+            var board = new Board(_config.MapSize, _config.MaxRewardCashback)
+                .WithRandomPlaced(initialTiles, _random);
+
+            return board;
+        }
+            
+        if (initialBoard.Size != _config.MapSize ||
+            initialBoard.MaxRewardCashback != _config.MaxRewardCashback)
+            throw new ArgumentException(
+                "Состояние доски initialBoard не согласовано с игровым конфигом");
+
+        return initialBoard.Clone();
     }
 }
