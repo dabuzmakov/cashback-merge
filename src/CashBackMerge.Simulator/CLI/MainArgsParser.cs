@@ -1,6 +1,4 @@
-﻿using CashBackMerge.Simulator.Models;
-
-namespace CashBackMerge.Simulator.Services;
+﻿namespace CashBackMerge.Simulator.CLI;
 
 public static class MainArgsParser
 {
