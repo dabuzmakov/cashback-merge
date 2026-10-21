@@ -14,7 +14,7 @@ public class Program
         var launchSettings = MainArgsParser.Parse(args);
 
         var configPath = Path.Combine(AppContext.BaseDirectory, _configDirectory);
-        var configBuilder = new ConfigurationBuilder().SetBasePath(configPath);
+        var configBuilder = new JsonConfigLoader().SetBasePath(configPath);
 
         var reportPath = Path.Combine(AppContext.BaseDirectory, _reportDirectory);
         var reportBuilder = new MarkdownReportBuilder().SetBasePath(reportPath);

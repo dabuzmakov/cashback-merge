@@ -3,11 +3,11 @@ using System.Text.Json;
 
 namespace CashBackMerge.Simulator.Configuration;
 
-public class ConfigurationBuilder
+public class JsonConfigLoader
 {
     private string _basePath = null!;
 
-    public ConfigurationBuilder SetBasePath(string path)
+    public JsonConfigLoader SetBasePath(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 

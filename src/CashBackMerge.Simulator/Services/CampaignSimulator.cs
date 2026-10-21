@@ -35,7 +35,8 @@ public class CampaignSimulator
         {
             var seed = seedGenerator.Next();
             var session = new GameSession(_gameConfig, seed);
-            var gameStrategy = StrategyMapper.Get(_campaignConfig.StrategyName);
+            var gameStrategy = StrategyFactory
+                .Create(_campaignConfig.StrategyName, seed);
 
             while (session.Status == GameStatus.InProgress)
                 session.ApplyMove(gameStrategy.GetNextMove(session));

@@ -14,7 +14,7 @@ public static class CampaignConfigValidator
             throw new ArgumentException(
                 $"Неверная конфигурация PlayersCount: количество игроков должно быть положительным целым числом");
 
-        if (!StrategyMapper.TryGetValue(config.StrategyName, out var _))
+        if (!StrategyFactory.Contains(config.StrategyName))
             throw new ArgumentException(
                 $"Неверная конфигурация Strategy: стратегии {config.StrategyName} не существует");
     }
