@@ -11,4 +11,12 @@ public record CampaignStatistics(
     decimal AverageReward,
     Dictionary<int, int> RewardDistribution)
 {
+    public decimal MaxRewardRate => RewardDistribution
+        .GetValueOrDefault(GameConfig.MaxRewardCashback)
+        / (decimal)CampaignConfig.PlayersCount;
+
+    public string Status => 
+        MaxRewardRate <= CampaignConfig.MaxRewardAllowedRate
+            ? "ОК"
+            : "Failed";
 }

@@ -27,7 +27,6 @@ public class CampaignSimulator
     public CampaignStatistics Run()
     {
         var seedGenerator = new Random(_seed);
-        var gameStrategy = StrategyMapper.Get(_campaignConfig.StrategyName);
 
         var rewardDistribution = new Dictionary<int, int>();
         var (totalScore, maxScore, totalReward) = (0, 0, 0);
@@ -36,6 +35,7 @@ public class CampaignSimulator
         {
             var seed = seedGenerator.Next();
             var session = new GameSession(_gameConfig, seed);
+            var gameStrategy = StrategyMapper.Get(_campaignConfig.StrategyName);
 
             while (session.Status == GameStatus.InProgress)
                 session.ApplyMove(gameStrategy.GetNextMove(session));
