@@ -1,3 +1,3 @@
 ﻿namespace CashBackMerge.Game.Models;
 
-public record LineMergeResult(List<Tile?> Tiles, int ScoreGained);
+public record LineMergeResult(Tile?[] Tiles, int ScoreGained);

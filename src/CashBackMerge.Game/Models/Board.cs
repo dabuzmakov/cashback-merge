@@ -169,10 +169,9 @@ public class Board
         set => _board[row, column] = value;
     }
 
-    private List<Tile?> ReadLine(Direction direction, int fixedIndex)
+    private Tile?[] ReadLine(Direction direction, int fixedIndex)
     {
-        var line = new List<Tile?>(Size);
-
+        var line = new Tile?[Size];
         var swapped = direction is Direction.Up or Direction.Down;
         var inverted = direction is Direction.Right or Direction.Down;
 
@@ -183,16 +182,17 @@ public class Board
             var row = swapped ? slidingIndex : fixedIndex;
             var col = swapped ? fixedIndex : slidingIndex;
 
-            line.Add(this[row, col]);
+            line[i] = this[row, col];
         }
 
         return line;
     }
 
-    private LineMergeResult MergeLine(List<Tile?> line)
+    private LineMergeResult MergeLine(Tile?[] line)
     {
         var scoreGained = 0;
-        var merged = new List<Tile?>();
+        var merged = new Tile?[Size];
+        var writeIndex = 0;
 
         var tiles = line
             .Where(tile => tile.HasValue)
@@ -206,19 +206,16 @@ public class Board
                 tiles[i].Cashback == tiles[i + 1].Cashback)
             {
                 var cashback = tiles[i++].Cashback * 2;
-                merged.Add(new Tile(cashback));
+                merged[writeIndex++] = new Tile(cashback);
                 scoreGained += cashback;
             }
-            else merged.Add(tiles[i]);
+            else merged[writeIndex++] = tiles[i];
         }
-
-        while (merged.Count < Size)
-            merged.Add(null);
 
         return new LineMergeResult(merged, scoreGained);
     }
 
-    private void WriteLine(Direction direction, int fixedIndex, List<Tile?> line)
+    private void WriteLine(Direction direction, int fixedIndex, Tile?[] line)
     {
         var swapped = direction is Direction.Up or Direction.Down;
         var inverted = direction is Direction.Right or Direction.Down;
