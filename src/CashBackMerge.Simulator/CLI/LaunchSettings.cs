@@ -1,4 +1,4 @@
-﻿namespace CashBackMerge.Simulator.Models;
+﻿namespace CashBackMerge.Simulator.CLI;
 
 public record LaunchSettings(
     string GameConfigName, 

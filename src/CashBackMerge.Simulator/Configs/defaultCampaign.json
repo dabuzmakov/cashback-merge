@@ -1,5 +1,5 @@
 {
   "playersCount": 10000,
-  "strategyName": "random",
+  "strategyName": "circle",
   "maxRewardAllowedRate": 0.1
 }

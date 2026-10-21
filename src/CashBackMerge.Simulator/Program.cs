@@ -1,12 +1,14 @@
 using CashBackMerge.Game.Configuration;
+using CashBackMerge.Simulator.CLI;
 using CashBackMerge.Simulator.Configuration;
+using CashBackMerge.Simulator.Reporting;
 using CashBackMerge.Simulator.Services;
 
 namespace CashBackMerge.Simulator;
 
 public class Program
 {
-    private const string _configDirectory = "JsonConfigurations";
+    private const string _configDirectory = "Configs";
     private const string _reportDirectory = "MarkdownReports";
 
     public static void Main(string[] args)

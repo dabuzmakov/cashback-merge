@@ -1,8 +1,9 @@
 ﻿using CashBackMerge.Game.Configuration;
+using CashBackMerge.Game.Models;
 using CashBackMerge.Game.Services;
 using System.Data;
 
-namespace CashBackMerge.Game.Models;
+namespace CashBackMerge.Game.Sessions;
 
 public class GameSession
 {

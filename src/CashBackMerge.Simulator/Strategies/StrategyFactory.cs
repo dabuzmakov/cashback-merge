@@ -5,7 +5,8 @@ public static class StrategyFactory
     private static readonly HashSet<string> Strategies = new HashSet<string>
     {
         "random",
-        "circle"
+        "circle",
+        "greedy-score",
     };
 
     public static bool Contains(string name)
@@ -16,6 +17,7 @@ public static class StrategyFactory
     {
         "random" => new RandomStrategy(seed),
         "circle" => new CircleStrategy(),
+        "greedy-score" => new GreedyScoreStrategy(),
         _ => throw new ArgumentException($"Неизвестная стратегия: {name}")
     };
 }

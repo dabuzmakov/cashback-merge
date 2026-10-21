@@ -1,10 +1,9 @@
 using CashBackMerge.Game.Configuration;
 using CashBackMerge.Game.Models;
 using CashBackMerge.Game.Services;
-
+using CashBackMerge.Simulator.Campaigns;
 using CashBackMerge.Simulator.Configuration;
-using CashBackMerge.Simulator.Models;
-using CashBackMerge.Simulator.Services;
+using CashBackMerge.Simulator.Reporting;
 
 namespace CashBackMerge.Tests.Mandatory.Mr3;
 

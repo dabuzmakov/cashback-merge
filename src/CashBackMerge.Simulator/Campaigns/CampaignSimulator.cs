@@ -1,7 +1,7 @@
 ﻿using CashBackMerge.Game.Configuration;
-using CashBackMerge.Game.Models;
+using CashBackMerge.Game.Sessions;
+using CashBackMerge.Simulator.Campaigns;
 using CashBackMerge.Simulator.Configuration;
-using CashBackMerge.Simulator.Models;
 using CashBackMerge.Simulator.Strategies;
 
 namespace CashBackMerge.Simulator.Services;

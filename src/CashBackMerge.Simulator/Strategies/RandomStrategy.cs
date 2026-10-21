@@ -1,4 +1,5 @@
 ﻿using CashBackMerge.Game.Models;
+using CashBackMerge.Game.Sessions;
 
 namespace CashBackMerge.Simulator.Strategies;
 

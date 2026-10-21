@@ -1,7 +1,7 @@
 ﻿using CashBackMerge.Game.Configuration;
 using CashBackMerge.Simulator.Configuration;
 
-namespace CashBackMerge.Simulator.Models;
+namespace CashBackMerge.Simulator.Campaigns;
 
 public record CampaignStatistics(
     GameConfig GameConfig,

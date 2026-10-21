@@ -1,9 +1,9 @@
 ﻿using CashBackMerge.Game.Configuration;
+using CashBackMerge.Simulator.Campaigns;
 using CashBackMerge.Simulator.Configuration;
-using CashBackMerge.Simulator.Models;
 using System.Text;
 
-namespace CashBackMerge.Simulator.Services;
+namespace CashBackMerge.Simulator.Reporting;
 
 public class MarkdownReportBuilder
 {
