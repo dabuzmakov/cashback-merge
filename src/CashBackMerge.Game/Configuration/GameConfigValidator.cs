@@ -1,10 +1,7 @@
-﻿using CashBackMerge.Game.Extensions;
-
-namespace CashBackMerge.Game.Configuration;
+﻿namespace CashBackMerge.Game.Configuration;
 
 public static class GameConfigValidator
 {
-    private const int _maxProbabilityScale = 18;
     private const int _maxSpawnRules = 9;
     private const int _minMapSize = 2;
     private const int _minMovesLimit = 1;
@@ -83,15 +80,10 @@ public static class GameConfigValidator
             throw new ArgumentException(
                 "Неверная конфигурация SpawnRules: вероятности должны быть положительными");
 
-        foreach (var rule in config.SpawnRules)
-        {
-            var scale = rule.Probability.GetScale();
-
-            if (scale > _maxProbabilityScale)
-                throw new ArgumentException(
-                    "Неверная конфигурация SpawnRules: максимальная точность определения вероятности " +
-                    $"{_maxProbabilityScale} знаков после запятой");
-        }
+        if (config.SpawnRules.Any(rule => rule.Probability != decimal.Round(rule.Probability, 2)))
+            throw new ArgumentException(
+                "Неверная конфигурация SpawnRules: максимальная точность определения вероятности " +
+                $"2 знаков после запятой");
 
         if (config.SpawnRules.Sum(rule => rule.Probability) != 1.0m)
             throw new ArgumentException(

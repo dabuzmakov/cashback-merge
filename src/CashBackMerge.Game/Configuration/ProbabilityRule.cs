@@ -2,5 +2,4 @@
 
 public record struct ProbabilityRule(int Value, decimal Probability)
 {
-
 }

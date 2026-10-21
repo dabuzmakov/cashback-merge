@@ -1,9 +1,9 @@
 ﻿using CashBackMerge.Game.Configuration;
+using CashBackMerge.Simulator.Campaigns;
 using CashBackMerge.Simulator.Configuration;
-using CashBackMerge.Simulator.Models;
 using System.Text;
 
-namespace CashBackMerge.Simulator.Services;
+namespace CashBackMerge.Simulator.Reporting;
 
 public class MarkdownReportBuilder
 {
@@ -40,7 +40,7 @@ public class MarkdownReportBuilder
         AppendResults(report, statistics);
 
         report.AppendLine();
-        report.AppendLine($"## Статус: {GetCampaignStatus(statistics)}");
+        report.AppendLine($"## Статус: {statistics.Status}");
 
         return report.ToString();
     }
@@ -108,21 +108,8 @@ public class MarkdownReportBuilder
         }
 
         report.AppendLine();
-        var maxRewardRate = GetMaxRewardRate(statistics) * 100;
+        var maxRewardRate = statistics.MaxRewardRate * 100;
         report.AppendLine(
             $"- Доля игроков с максимальной наградой: {maxRewardRate:F2}%");
-    }
-
-    private static string GetCampaignStatus(CampaignStatistics statistics)
-        => GetMaxRewardRate(statistics) <= statistics.CampaignConfig.MaxRewardAllowedRate
-            ? "ОК"
-            : "Failed";
-
-    private static decimal GetMaxRewardRate(CampaignStatistics statistics)
-    {
-        var players = statistics.RewardDistribution
-            .GetValueOrDefault(statistics.GameConfig.MaxRewardCashback);
-
-        return players / (decimal)statistics.CampaignConfig.PlayersCount;
     }
 }

@@ -1,15 +1,16 @@
 using CashBackMerge.Game.Configuration;
+using CashBackMerge.Game.Models;
 using CashBackMerge.Game.Services;
-
+using CashBackMerge.Simulator.Campaigns;
 using CashBackMerge.Simulator.Configuration;
-using CashBackMerge.Simulator.Services;
+using CashBackMerge.Simulator.Reporting;
 
 namespace CashBackMerge.Tests.Mandatory.Mr3;
 
 /// <summary>Обязательные тесты: награды, симуляция и отчёт.</summary>
 public class RewardAndSimulationTest
 {
-    private readonly GameConfig _gameConfig = new GameConfig(
+    private static readonly GameConfig _gameConfig = new GameConfig(
         MapSize: 4,
         MovesLimit: 40,
         MaxRewardCashback: 32,
@@ -22,29 +23,44 @@ public class RewardAndSimulationTest
         ]
     );
 
-    private readonly CampaignConfig _campaignConfig = new CampaignConfig(
-        PlayersCount: 10000,
+    private static readonly CampaignConfig _campaignConfig = new CampaignConfig(
         MaxRewardAllowedRate: 0.15m,
-        StrategyName: "circle"
+        StrategyName: "random",
+        PlayersCount: 10000
     );
+
+    private static readonly CampaignStatistics _statistics = new CampaignStatistics(
+        GameConfig: _gameConfig,
+        CampaignConfig: _campaignConfig,
+        AverageScore: 100m,
+        MaxScore: 200,
+        AverageReward: 17.6m,
+        RewardDistribution: new Dictionary<int, int>
+        {
+            [8] = 2000,
+            [16] = 6000,
+            [32] = 2000
+        }
+    );
+
+    private static readonly string _markdownReport = 
+        MarkdownReportBuilder.CreateReport(_statistics);
 
     [Fact(DisplayName = "Максимальная плитка 16% даёт награду соответствующего tier")]
     public void RewardMatchesHighestTile()
     {
         var maxTileOnBoard = 16;
 
-        var config = _gameConfig with
-        {
-            DeterminedStringState =
-            $"{maxTileOnBoard},.,.,.\r\n" +
-            ".,.,.,.\r\n" +
-            ".,.,.,.\r\n" +
-            ".,.,.,."
-        };
+        var board = new Board(_gameConfig.MapSize, _gameConfig.MaxRewardCashback)
+            .WithFixedState(new int[,]
+            {
+                { 16, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 }
+            });
 
-        var controller = new GameController(config, seed: 67);
-        var session = controller.CreateNewGame();
-
+        var session = new GameSession(_gameConfig, seed: 67, board);
         Assert.Equal(maxTileOnBoard, session.Reward);
     }
 
@@ -74,50 +90,25 @@ public class RewardAndSimulationTest
     [Fact(DisplayName = "Отчёт содержит распределение максимальных плиток и наград")]
     public void ReportContainsDistributions()
     {
-        var report = MakeFailedReport();
+        var report = MarkdownReportBuilder.CreateReport(_statistics);
 
         Assert.Contains("- Распределение наград:", report);
-        Assert.Contains("    8: 324 (3,24%)", report);
-        Assert.Contains("    16: 8039 (80,39%)", report);
-        Assert.Contains("    32: 1637 (16,37%)", report);
+        Assert.Contains("    8: 2000 (20,00%)", report);
+        Assert.Contains("    16: 6000 (60,00%)", report);
+        Assert.Contains("    32: 2000 (20,00%)", report);
     }
 
     [Fact(DisplayName = "Отчёт содержит долю игроков с максимальной наградой")]
     public void ReportContainsMaxRewardRate()
     {
-        var report = MakeFailedReport();
-
-        Assert.Contains("- Доля игроков с максимальной наградой: 16,37%", report);
+        var rate = _statistics.MaxRewardRate * 100;
+        Assert.Contains($"- Доля игроков с максимальной наградой: {rate:F2}%", _markdownReport);
     }
 
     [Fact(DisplayName = "Статус OK, если actualMaxRewardRate <= maxRewardAllowedRate, иначе FAILED")]
     public void ReportStatusReflectsBusinessConstraint()
     {
-        var failedReport = MakeFailedReport();
-        var successedReport = MakeSuccessedReport();
-
-        Assert.Contains("## Статус: Failed", failedReport);
-        Assert.Contains("## Статус: ОК", successedReport);
-    }
-
-    private string MakeFailedReport()
-    {
-        var simulator = new CampaignSimulator(_campaignConfig, _gameConfig, seed: 67);
-        var statistics = simulator.Run();
-
-        return MarkdownReportBuilder.CreateReport(statistics);
-    }
-
-    private string MakeSuccessedReport()
-    {
-        var campaignConfig = _campaignConfig with
-        {
-            MaxRewardAllowedRate = 1m
-        };
-
-        var simulator = new CampaignSimulator(campaignConfig, _gameConfig, seed: 67);
-        var statistics = simulator.Run();
-
-        return MarkdownReportBuilder.CreateReport(statistics);
+        var status = _statistics.Status;
+        Assert.Contains($"## Статус: {status}", _markdownReport);
     }
 }

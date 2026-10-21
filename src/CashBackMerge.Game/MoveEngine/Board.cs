@@ -1,5 +1,4 @@
-﻿using CashBackMerge.Game.Configuration;
-using System.Text;
+﻿using System.Data;
 
 namespace CashBackMerge.Game.Models;
 
@@ -16,10 +15,39 @@ public class Board
         MaxRewardCashback = maxRewardCashback;
     }
 
-    public Tile? this[int row, int column]
+    public Board WithRandomPlaced(IEnumerable<Tile> initialTiles, Random random)
     {
-        get => _board[row, column];
-        set => _board[row, column] = value;
+        var board = new Board(Size, MaxRewardCashback);
+
+        foreach (var tile in initialTiles)
+            board.TryPlaceRandom(tile, random);
+
+        return board;
+    }
+
+    public Board WithFixedState(int[,] tiles)
+    {
+        var board = new Board(Size, MaxRewardCashback);
+
+        for (var row = 0; row < Size; row++)
+        for (var col = 0; col < Size; col++)
+        {
+            var value = tiles[row, col];
+            board[row, col] = value == 0 ? null : new Tile(value);
+        }
+
+        return board;
+    }
+
+    public Board Clone()
+    {
+        var cloned = new Board(Size, MaxRewardCashback);
+
+        for (var row = 0; row < Size; row++)
+            for (var col = 0; col < Size; col++)
+                cloned[row, col] = _board[row, col];
+
+        return cloned;
     }
 
     public MoveResult TryMove(Direction direction)
@@ -70,16 +98,16 @@ public class Board
         return false;
     }
 
-    public List<(int Row, int Col)> GetEmptyPositions()
+    public bool TryPlaceRandom(Tile tile, Random random)
     {
-        var emptyCells = new List<(int Row, int Col)>();
+        var emptyCells = GetEmptyPositions();
 
-        for (var row = 0; row < Size; row++)
-            for (var col = 0; col < Size; col++)
-                if (this[row, col] is null)
-                    emptyCells.Add((row, col));
+        if (emptyCells.Count == 0)
+            return false;
 
-        return emptyCells;
+        var position = emptyCells[random.Next(emptyCells.Count)];
+        _board[position.Row, position.Col] = tile;
+        return true;
     }
 
     public int GetMaxTileValue()
@@ -93,10 +121,57 @@ public class Board
         return maxValue;
     }
 
-    private List<Tile?> ReadLine(Direction direction, int fixedIndex)
+    public List<(int Row, int Col)> GetEmptyPositions()
     {
-        var line = new List<Tile?>(Size);
+        var emptyCells = new List<(int Row, int Col)>();
 
+        for (var row = 0; row < Size; row++)
+            for (var col = 0; col < Size; col++)
+                if (this[row, col] is null)
+                    emptyCells.Add((row, col));
+
+        return emptyCells;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is not Board other)
+            return false;
+
+        if (Size != other.Size || 
+            MaxRewardCashback != other.MaxRewardCashback)
+            return false;
+
+        for (var row = 0; row < Size; row++)
+            for (var col = 0; col < Size; col++)
+                if (_board[row, col] != other[row, col])
+                    return false;
+
+        return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hash = new HashCode();
+
+        hash.Add(Size);
+        hash.Add(MaxRewardCashback);
+
+        foreach (var tile in _board)
+            hash.Add(tile);
+
+        return hash.ToHashCode();
+    }
+
+    private Tile? this[int row, int column]
+    {
+        get => _board[row, column];
+        set => _board[row, column] = value;
+    }
+
+    private Tile?[] ReadLine(Direction direction, int fixedIndex)
+    {
+        var line = new Tile?[Size];
         var swapped = direction is Direction.Up or Direction.Down;
         var inverted = direction is Direction.Right or Direction.Down;
 
@@ -107,16 +182,17 @@ public class Board
             var row = swapped ? slidingIndex : fixedIndex;
             var col = swapped ? fixedIndex : slidingIndex;
 
-            line.Add(this[row, col]);
+            line[i] = this[row, col];
         }
 
         return line;
     }
 
-    private LineMergeResult MergeLine(List<Tile?> line)
+    private LineMergeResult MergeLine(Tile?[] line)
     {
         var scoreGained = 0;
-        var merged = new List<Tile?>();
+        var merged = new Tile?[Size];
+        var writeIndex = 0;
 
         var tiles = line
             .Where(tile => tile.HasValue)
@@ -130,19 +206,16 @@ public class Board
                 tiles[i].Cashback == tiles[i + 1].Cashback)
             {
                 var cashback = tiles[i++].Cashback * 2;
-                merged.Add(new Tile(cashback));
+                merged[writeIndex++] = new Tile(cashback);
                 scoreGained += cashback;
             }
-            else merged.Add(tiles[i]);
+            else merged[writeIndex++] = tiles[i];
         }
-
-        while (merged.Count < Size)
-            merged.Add(null);
 
         return new LineMergeResult(merged, scoreGained);
     }
 
-    private void WriteLine(Direction direction, int fixedIndex, List<Tile?> line)
+    private void WriteLine(Direction direction, int fixedIndex, Tile?[] line)
     {
         var swapped = direction is Direction.Up or Direction.Down;
         var inverted = direction is Direction.Right or Direction.Down;
@@ -156,44 +229,5 @@ public class Board
 
             this[row, col] = line[i];
         }
-    }
-
-    public override string ToString()
-    {
-        var builder = new StringBuilder();
-
-        for (var row = 0; row < Size; row++)
-        {
-            for (var column = 0; column < Size; column++)
-            {
-                if (column > 0)
-                    builder.Append(',');
-
-                builder.Append(_board[row, column]?.Cashback.ToString() ?? ".");
-            }
-
-            if (row < Size - 1)
-                builder.AppendLine();
-        }
-
-        return builder.ToString();
-    }
-
-    public static Board FromString(string stringBoard, int size, int maxReward)
-    {
-        var board = new Board(size, maxReward);
-
-        var rows = stringBoard.Split("\r\n");
-
-        for (var row = 0; row < board.Size; row++)
-        {
-            var cells = rows[row].Split(',');
-
-            for (var col = 0; col < board.Size; col++)
-                if (cells[col] != ".")
-                    board[row, col] = new Tile(int.Parse(cells[col]));
-        }
-
-        return board;
     }
 }

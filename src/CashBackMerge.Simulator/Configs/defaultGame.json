@@ -1,19 +1,23 @@
 {
   "mapSize": 4,
-  "movesLimit": 40,
+  "movesLimit": 20,
   "maxRewardCashback": 32,
   "initialState": [ 1, 1 ],
   "spawnRules": [
     {
       "value": 1,
-      "probability": 0.85
+      "probability": 0.6
     },
     {
       "value": 2,
-      "probability": 0.1
+      "probability": 0.2
     },
     {
       "value": 4,
+      "probability": 0.15
+    },
+    {
+      "value": 8,
       "probability": 0.05
     }
   ]

@@ -1,12 +1,14 @@
 using CashBackMerge.Game.Configuration;
+using CashBackMerge.Simulator.CLI;
 using CashBackMerge.Simulator.Configuration;
+using CashBackMerge.Simulator.Reporting;
 using CashBackMerge.Simulator.Services;
 
 namespace CashBackMerge.Simulator;
 
 public class Program
 {
-    private const string _configDirectory = "JsonConfigurations";
+    private const string _configDirectory = "Configs";
     private const string _reportDirectory = "MarkdownReports";
 
     public static void Main(string[] args)
@@ -14,7 +16,7 @@ public class Program
         var launchSettings = MainArgsParser.Parse(args);
 
         var configPath = Path.Combine(AppContext.BaseDirectory, _configDirectory);
-        var configBuilder = new ConfigurationBuilder().SetBasePath(configPath);
+        var configBuilder = new JsonConfigLoader().SetBasePath(configPath);
 
         var reportPath = Path.Combine(AppContext.BaseDirectory, _reportDirectory);
         var reportBuilder = new MarkdownReportBuilder().SetBasePath(reportPath);

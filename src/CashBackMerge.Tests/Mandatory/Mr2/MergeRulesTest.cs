@@ -6,41 +6,142 @@ namespace CashBackMerge.Tests.Mandatory.Mr2;
 public class MergeRulesTest
 {
     [Theory(DisplayName = "Сдвиг влево: строка до -> после")]
-    [InlineData(
-        "1,1,.,.\r\n1,1,1,.\r\n1,1,1,1\r\n2,2,4,4",
-        "2,.,.,.\r\n2,1,.,.\r\n2,2,.,.\r\n4,8,.,.")]
-    public void RowShiftsLeftAndMerges(string before, string expected)
+    [MemberData(nameof(RowShiftsLeftData))]
+    public void RowShiftsLeftAndMerges(int[,] before, int[,] expected)
         => AssertMove(before, expected, Direction.Left);
 
-    [Theory(DisplayName = "Одна плитка не сливается дважды за ход: [1,1,2,.] -> [2,2,.,.]")]
-    [InlineData(
-        "1,1,2,.\r\n.,.,.,.\r\n.,.,.,.\r\n.,.,.,.",
-        "2,2,.,.\r\n.,.,.,.\r\n.,.,.,.\r\n.,.,.,.")]
-    public void TileDoesNotMergeTwiceInOneMove(string before, string expected)
+    public static TheoryData<int[,], int[,]> RowShiftsLeftData => new()
+    {
+        {
+            new int[,]
+            {
+                { 1, 1, 0, 0 },
+                { 1, 1, 1, 0 },
+                { 1, 1, 1, 1 },
+                { 2, 2, 4, 4 }
+            },
+            new int[,]
+            {
+                { 2, 0, 0, 0 },
+                { 2, 1, 0, 0 },
+                { 2, 2, 0, 0 },
+                { 4, 8, 0, 0 }
+            }
+        }
+    };
+
+    [Theory(DisplayName = "Одна плитка не сливается дважды за ход")]
+    [MemberData(nameof(TileDoesNotMergeTwiceData))]
+    public void TileDoesNotMergeTwiceInOneMove(int[,] before, int[,] expected)
         => AssertMove(before, expected, Direction.Left);
+
+    public static TheoryData<int[,], int[,]> TileDoesNotMergeTwiceData => new()
+    {
+        {
+            new int[,]
+            {
+                { 1, 1, 2, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 }
+            },
+            new int[,]
+            {
+                { 2, 2, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 }
+            }
+        }
+    };
 
     [Theory(DisplayName = "Слияние работает во всех четырёх направлениях")]
-    [InlineData(
-        "1,.,2,4\r\n1,2,2,.\r\n4,2,.,8\r\n4,.,.,8", 
-        "2,4,4,4\r\n8,.,.,16\r\n.,.,.,.\r\n.,.,.,.", Direction.Up)]
-    [InlineData(
-        "1,.,2,4\r\n1,2,2,4\r\n4,2,.,8\r\n4,.,.,8", 
-        ".,.,.,.\r\n.,.,.,.\r\n2,.,.,8\r\n8,4,4,16", Direction.Down)]
-    [InlineData(
-        "1,1,2,4\r\n2,2,.,4\r\n4,.,4,8\r\n4,4,8,8", 
-        "2,2,4,.\r\n4,4,.,.\r\n8,8,.,.\r\n8,16,.,.", Direction.Left)]
-    [InlineData(
-        "1,1,2,4\r\n2,2,.,4\r\n4,.,4,8\r\n4,4,8,8", 
-        ".,2,2,4\r\n.,.,4,4\r\n.,.,8,8\r\n.,.,8,16", Direction.Right)]
-    public void MergeWorksInAllDirections(string before, string expected, Direction direction)
+    [MemberData(nameof(MergeWorksInAllDirectionsData))]
+    public void MergeWorksInAllDirections(
+        int[,] before, int[,] expected, Direction direction)
         => AssertMove(before, expected, direction);
 
-    private static void AssertMove(string before, string expected, Direction direction)
+    public static TheoryData<int[,], int[,], Direction> MergeWorksInAllDirectionsData => new()
     {
-        var board = Board.FromString(before, size: 4, maxReward: 32);
+        {
+            new int[,]
+            {
+                { 1, 0, 2, 4 },
+                { 1, 2, 2, 0 },
+                { 4, 2, 0, 8 },
+                { 4, 0, 0, 8 }
+            },
+            new int[,]
+            {
+                { 2, 4, 4, 4 },
+                { 8, 0, 0, 16 },
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 }
+            },
+            Direction.Up
+        },
+        {
+            new int[,]
+            {
+                { 1, 0, 2, 4 },
+                { 1, 2, 2, 4 },
+                { 4, 2, 0, 8 },
+                { 4, 0, 0, 8 }
+            },
+            new int[,]
+            {
+                { 0, 0, 0, 0 },
+                { 0, 0, 0, 0 },
+                { 2, 0, 0, 8 },
+                { 8, 4, 4, 16 }
+            },
+            Direction.Down
+        },
+        {
+            new int[,]
+            {
+                { 1, 1, 2, 4 },
+                { 2, 2, 0, 4 },
+                { 4, 0, 4, 8 },
+                { 4, 4, 8, 8 }
+            },
+            new int[,]
+            {
+                { 2, 2, 4, 0 },
+                { 4, 4, 0, 0 },
+                { 8, 8, 0, 0 },
+                { 8, 16, 0, 0 }
+            },
+            Direction.Left
+        },
+        {
+            new int[,]
+            {
+                { 1, 1, 2, 4 },
+                { 2, 2, 0, 4 },
+                { 4, 0, 4, 8 },
+                { 4, 4, 8, 8 }
+            },
+            new int[,]
+            {
+                { 0, 2, 2, 4 },
+                { 0, 0, 4, 4 },
+                { 0, 0, 8, 8 },
+                { 0, 0, 8, 16 }
+            },
+            Direction.Right
+        }
+    };
 
-        board.TryMove(direction);
+    private static void AssertMove(int[,] before, int[,] expected, Direction direction)
+    {
+        var defaultBoard = new Board(boardSize: 4, maxRewardCashback: 32);
 
-        Assert.Equal(expected, board.ToString());
+        var currentBoard = defaultBoard.WithFixedState(before);
+        var expectedBoard = defaultBoard.WithFixedState(expected);
+
+        currentBoard.TryMove(direction);
+
+        Assert.Equal(currentBoard, expectedBoard);
     }
 }

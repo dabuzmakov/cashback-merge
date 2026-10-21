@@ -1,8 +1,7 @@
 ﻿using CashBackMerge.Game.Configuration;
-using CashBackMerge.Game.Models;
-using CashBackMerge.Game.Services;
+using CashBackMerge.Game.Sessions;
+using CashBackMerge.Simulator.Campaigns;
 using CashBackMerge.Simulator.Configuration;
-using CashBackMerge.Simulator.Models;
 using CashBackMerge.Simulator.Strategies;
 
 namespace CashBackMerge.Simulator.Services;
@@ -27,15 +26,17 @@ public class CampaignSimulator
 
     public CampaignStatistics Run()
     {
-        var gameStrategy = StrategyMapper.Get(_campaignConfig.StrategyName);
-        var controller = new GameController(_gameConfig, _seed);
+        var seedGenerator = new Random(_seed);
 
         var rewardDistribution = new Dictionary<int, int>();
         var (totalScore, maxScore, totalReward) = (0, 0, 0);
 
         for (var i = 0; i < _campaignConfig.PlayersCount; i++)
         {
-            var session = controller.CreateNewGame();
+            var seed = seedGenerator.Next();
+            var session = new GameSession(_gameConfig, seed);
+            var gameStrategy = StrategyFactory
+                .Create(_campaignConfig.StrategyName, seed);
 
             while (session.Status == GameStatus.InProgress)
                 session.ApplyMove(gameStrategy.GetNextMove(session));
@@ -49,7 +50,7 @@ public class CampaignSimulator
         }
 
         return new CampaignStatistics(
-            GameConfig: controller.Config,
+            GameConfig: _gameConfig,
             CampaignConfig: _campaignConfig,
             AverageScore: (decimal)totalScore / _campaignConfig.PlayersCount,
             MaxScore: maxScore,

@@ -1,4 +1,4 @@
-﻿namespace CashBackMerge.Game.Models;
+﻿namespace CashBackMerge.Game.Sessions;
 
 public enum GameStatus
 {
