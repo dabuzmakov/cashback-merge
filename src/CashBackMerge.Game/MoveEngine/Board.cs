@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace CashBackMerge.Game.Models;
+﻿namespace CashBackMerge.Game.Models;
 
 public class Board
 {
@@ -54,8 +52,7 @@ public class Board
     {
         var changed = false;
         var scoreGained = 0;
-        var swapped = direction is Direction.Up or Direction.Down;
-        var inverted = direction is Direction.Right or Direction.Down;
+        var (swapped, inverted) = GetProjection(direction);
 
         for (var outer = 0; outer < Size; outer++)
         {
@@ -172,8 +169,7 @@ public class Board
     private Tile?[] ReadLine(Direction direction, int fixedIndex)
     {
         var line = new Tile?[Size];
-        var swapped = direction is Direction.Up or Direction.Down;
-        var inverted = direction is Direction.Right or Direction.Down;
+        var (swapped, inverted) = GetProjection(direction);
 
         for (var i = 0; i < Size; i++)
         {
@@ -217,8 +213,7 @@ public class Board
 
     private void WriteLine(Direction direction, int fixedIndex, Tile?[] line)
     {
-        var swapped = direction is Direction.Up or Direction.Down;
-        var inverted = direction is Direction.Right or Direction.Down;
+        var (swapped, inverted) = GetProjection(direction);
 
         for (var i = 0; i < Size; i++)
         {
@@ -230,4 +225,8 @@ public class Board
             this[row, col] = line[i];
         }
     }
+
+    private static (bool Swapped, bool Inverted) GetProjection(Direction direction)
+        => (direction is Direction.Up or Direction.Down,
+            direction is Direction.Right or Direction.Down);
 }

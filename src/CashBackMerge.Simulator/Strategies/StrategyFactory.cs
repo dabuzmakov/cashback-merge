@@ -2,22 +2,19 @@
 
 public static class StrategyFactory
 {
-    private static readonly HashSet<string> Strategies = new HashSet<string>
-    {
-        "random",
-        "circle",
-        "greedy-score",
-    };
+    private static readonly IReadOnlyDictionary<string, Func<int, IGameStrategy>> _registry =
+         new Dictionary<string, Func<int, IGameStrategy>>(StringComparer.OrdinalIgnoreCase)
+         {
+             ["random"] = seed => new RandomStrategy(seed),
+             ["circle"] = _ => new CircleStrategy(),
+             ["greedy-score"] = _ => new GreedyScoreStrategy(),
+         };
 
     public static bool Contains(string name)
-        => Strategies.Contains(name);
+        => _registry.ContainsKey(name);
 
     public static IGameStrategy Create(string name, int seed)
-        => name.ToLowerInvariant() switch
-    {
-        "random" => new RandomStrategy(seed),
-        "circle" => new CircleStrategy(),
-        "greedy-score" => new GreedyScoreStrategy(),
-        _ => throw new ArgumentException($"Неизвестная стратегия: {name}")
-    };
+        => _registry.TryGetValue(name, out var factory)
+            ? factory(seed)
+            : throw new ArgumentException($"Неизвестная стратегия: {name}");
 }
