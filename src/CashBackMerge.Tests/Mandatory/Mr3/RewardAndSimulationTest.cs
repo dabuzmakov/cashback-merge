@@ -4,6 +4,7 @@ using CashBackMerge.Game.Services;
 using CashBackMerge.Simulator.Campaigns;
 using CashBackMerge.Simulator.Configuration;
 using CashBackMerge.Simulator.Reporting;
+using CashBackMerge.Game.Sessions;
 
 namespace CashBackMerge.Tests.Mandatory.Mr3;
 

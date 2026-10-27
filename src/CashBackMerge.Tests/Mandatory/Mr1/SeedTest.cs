@@ -1,5 +1,5 @@
 using CashBackMerge.Game.Configuration;
-using CashBackMerge.Game.Models;
+using CashBackMerge.Game.Sessions;
 using CashBackMerge.Simulator.Configuration;
 using CashBackMerge.Simulator.Reporting;
 using CashBackMerge.Simulator.Services;
